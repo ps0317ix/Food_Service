@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FoodService</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/v-lazy-image@1.4.0/dist/v-lazy-image.min.js"></script>
+    <script src="https://unpkg.com/vuejs-paginate@2.1.0"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  </head>
+
+  <body>
+    <header>
+      <ul>
+        <li>
+          <div class="">
+            <%= link_to "Food_App", "/" %>
+          </div>
+        </li>
+        <li>
+          <%= form_tag("/search_exe",:method => 'get') do %>
+            <%= text_field_tag :search %>
+            <%= submit_tag 'Search', :name => nil %>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to "新規作成", "/place/new" %>
+        </li>
+      </ul>
+
+    </header>
+    <%= yield %>
+  </body>
+</html>

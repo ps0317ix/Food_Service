@@ -1,0 +1,23 @@
+<div class="main users-new">
+  <div class="container">
+    <div class="form-heading">新規エリア登録</div>
+    <div class="form users-form">
+      <div class="form-body">
+        <% @place.errors.full_messages.each do |message| %>
+          <div class="form-error">
+            <%= message %>
+          </div>
+        <% end %>
+        <%= form_tag("/place/create") do %>
+          <p>地域名</p>
+          <input name="area" value="<%= @place.area %>">
+          <p>リンク</p>
+          <input name="url" value="<%= @place.url %>">
+          <p>サービス名</p>
+          <input name="service" value="<%= @place.service %>">
+          <input type="submit" value="新規登録">
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

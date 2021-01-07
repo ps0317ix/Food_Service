@@ -1,0 +1,15 @@
+
+<p>検索</p>
+<%= form_tag(search_path,:method => 'get') do %>
+  <%= text_field_tag :search %>
+  <%= submit_tag 'Search', :name => nil %>
+<% end %>
+
+<ul>
+  <% @places.each do |post| %>
+  <li>
+    <h3>サービス名　<%= post.service %></h3>
+    <p>エリア：</p><%= link_to post.title, post.link %>
+  </li>
+  <% end %>
+</ul>
