@@ -1,0 +1,117 @@
+<div class="main user-show">
+  <div class="container">
+    <div id="ranking">
+        <div class="rankings tabelog_rankings">
+          <div class="ranking_results" style="padding-top:50px;">
+            <h3 style="padding:10px 0px;"><%= params[:area] %>の食べログランキング</h3>
+            <ul>
+              <template v-for="item in getTabelogItems">
+                <a :href="item.href">
+                  <li class="ranking_result row">
+                      <div class="ranking_result_img col-md-4">
+                        <v-lazy-image :src="item.img" :src-placeholder="item.img" ></v-lazy-image>
+                      </div>
+                      <div class="ranking_result_content col-md-8">
+                        <h2>{{ item.no }}位　{{ item.name }}</h2>
+                        <p>{{ item.jenle }}</p>
+                      </div>
+                  </li>
+                </a>
+              </template>
+            </ul>
+            <paginate
+              :page-count="getPageCount"
+              :page-range="3"
+              :margin-pages="2"
+              :click-handler="clickCallback"
+              :prev-text="'＜'"
+              :next-text="'＞'"
+              :container-class="'pagination'"
+              :page-class="'page-item'">
+            </paginate>
+          </div>
+        </div>
+
+        <div class="rankings tabelog_rankings">
+          <div class="ranking_results" id="ranking" style="padding-top:50px;">
+            <h3 style="padding:10px 0px;"><%= params[:area] %>の一休ランキング</h3>
+            <ul>
+              <template v-for="item in getIkkyuItems">
+                <a :href="item.href">
+                  <li class="ranking_result row">
+                      <div class="ranking_result_img col-md-4">
+                        <v-lazy-image :src="item.img" :src-placeholder="item.img" ></v-lazy-image>
+                      </div>
+                      <div class="ranking_result_content col-md-8">
+                        <h2>{{ item.no }}位　{{ item.name }}</h2>
+                      </div>
+                  </li>
+                </a>
+              </template>
+            </ul>
+            <paginate
+              :page-count="getPageCount"
+              :page-range="3"
+              :margin-pages="2"
+              :click-handler="clickCallback"
+              :prev-text="'＜'"
+              :next-text="'＞'"
+              :container-class="'pagination'"
+              :page-class="'page-item'">
+            </paginate>
+          </div>
+        </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+
+    const VLazyImagePlugin = window['VLazyImage'].VLazyImagePlugin;
+    Vue.use(VLazyImagePlugin);
+
+    Vue.component('paginate', VuejsPaginate)
+
+    new Vue({
+       el: '#ranking',
+       data: {
+         parPage: 5,
+         currentPage: 1,
+         tabelogitems: [
+           <% @cnt = 1
+           @tabeloghops.each do |shop| %>
+               {no: <%= @cnt %>, name: "<%= shop.name %>", href: "<%= shop.url %>", img: "<%= shop.img %>", jenle: "<%= shop.jenre %>"},
+           <% @cnt += 1
+           end %>
+         ],
+         ikkyuitems: [
+           <% @cnt = 1
+           @ikkyushops.each do |shop| %>
+               {no: <%= @cnt %>, name: "<%= shop.name %>", href: "<%= shop.url %>", img: "<%= shop.img %>", jenle: "<%= shop.jenre %>"},
+           <% @cnt += 1
+           end %>
+         ]
+       },
+       methods: {
+        clickCallback: function (pageNum) {
+           this.currentPage = Number(pageNum);
+        }
+       },
+       computed: {
+         getTabelogItems: function() {
+          let current = this.currentPage * this.parPage;
+          let start = current - this.parPage;
+          return this.tabelogitems.slice(start, current);
+         },
+         getIkkyuItems: function() {
+          let current = this.currentPage * this.parPage;
+          let start = current - this.parPage;
+          return this.ikkyuitems.slice(start, current);
+        },
+         getPageCount: function() {
+          return Math.ceil(this.tabelogitems.length / this.parPage);
+        },
+       }
+     })
+</script>

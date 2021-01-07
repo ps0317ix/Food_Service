@@ -1,0 +1,68 @@
+
+<div class="main top-main">
+  <div class="container">
+    <div class="top-message">
+      <p style="padding:10px 0px;">東京の主要駅を入力して検索</p>
+      <%= form_tag("/search_exe",:method => 'get') do %>
+        <%= text_field_tag :search %>
+        <%= submit_tag 'Search', :name => nil %>
+      <% end %>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <%
+        if @allPlaces
+          @allPlaces.each do |place|
+      %>
+        <ul>
+          <li><%= link_to "#{place.area}の#{place.service}ランキング", "#{place.url}" %></li>
+        </ul>
+      <%
+          end
+        end
+      %>
+    </div>
+  </footer>
+
+
+
+</div>
+
+<script type="text/javascript">
+  const VLazyImagePlugin = window['VLazyImage'].VLazyImagePlugin;
+  Vue.use(VLazyImagePlugin);
+
+  Vue.component('paginate', VuejsPaginate)
+
+  var data = {
+    parPage: 5,
+    currentPage: 1,
+    tabelogitems: [
+
+    ]
+  }
+
+  new Vue({
+     el: '#tabelog_ranking',
+     data: data,
+     methods: {
+      clickCallback: function (pageNum) {
+         this.currentPage = Number(pageNum);
+      }
+     },
+     computed: {
+       getItems: function() {
+        let current = this.currentPage * this.parPage;
+        let start = current - this.parPage;
+        return this.tabelogitems.slice(start, current);
+       },
+       getPageCount: function() {
+        return Math.ceil(this.tabelogitems.length / this.parPage);
+      },
+     }
+   })
+
+
+</script>

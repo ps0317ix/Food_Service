@@ -1,0 +1,42 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+
+<div class="main user-show">
+  <div class="container">
+    <div class="table__wrapper" style="padding-top:50px;">
+    <h1>エリア一覧</h1>
+    <table class="table is-bordered pricing__table is-fullwidth">
+      <tr>
+        <td><p>No.</p></td>
+        <td><p>エリア名</p></td>
+        <td><p>サービス名</p></td>
+        <td><p>作成日時</p></td>
+        <td><p>更新日時</p></td>
+        <td><p>更新</p></td>
+        <td><p>削除</p></td>
+      </tr>
+      <% @cnt = 1
+      @allPlaces.each do |place| %>
+        <tr>
+          <td><p><%= @cnt %></p></td>
+          <td><p><%= link_to place.area, "/place/#{place.area}" %></p></td>
+          <td><p><%= place.service %></p></td>
+          <td><p><%= place.created_at %></p></td>
+          <td><p><%= place.updated_at %></p></td>
+          <td>
+            <%= form_tag("/place/#{place.id}/update", class:"button is-primary", multipart: true) do %>
+              <input type="submit" value="更新">
+            <% end %>
+          </td>
+          <td>
+            <%= form_tag("/place/#{place.id}/delete",class:"button is-danger", multipart: true) do %>
+              <input type="submit" value="削除">
+            <% end %>
+          </td>
+        </tr>
+      <% @cnt += 1
+      end %>
+    </table>
+
+    </div>
+  </div>
+</div>

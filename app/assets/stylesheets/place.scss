@@ -1,0 +1,24 @@
+// Place all the styles related to the Place controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+
+.ranking_result{
+  width: 100%;
+  border: 1px solid rgb(255, 179, 0);
+}
+
+.col-md-4{
+  padding: 0px;
+}
+
+.ranking_result_img img{
+  width: 100%;
+  height: 164px;
+  object-fit: cover;
+}
+
+.ranking_result_content{
+  text-align: left;
+
+}
