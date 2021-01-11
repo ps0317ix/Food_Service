@@ -139,7 +139,7 @@
  }
 
 
-
+/* コンテンツ */
  .container {
    max-width: 1000px;
    margin: 0px auto;
@@ -147,3 +147,30 @@
    padding-right: 15px;
    clear: both;
  }
+
+
+  /* map関連 */
+  .map_container {
+    clear: both;
+    width: 90%;
+    padding: 4px;
+    border: 1px solid #CCC;
+  }
+  .map_canvas {
+    width: 100%;
+    height: 500px;
+  }
+
+  #url, #zoom {
+    display: none;
+  }
+
+  .map_content {
+    width: 250px;
+    height: 70px;
+  }
+
+  #tabelog_map_canvas{
+    width: 700px;
+    height: 400px;
+  }

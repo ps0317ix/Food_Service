@@ -4,16 +4,20 @@
         <div class="rankings tabelog_rankings">
           <div class="ranking_results" style="padding-top:50px;">
             <h3 style="padding:10px 0px;"><%= params[:area] %>の食べログランキング</h3>
+            <div class="map_container">
+              <div id="tabelog_map_canvas"></div>
+            </div>
             <ul>
               <template v-for="item in getTabelogItems">
-                <a :href="item.href">
+                <a class="item_link" :href="item.href">
                   <li class="ranking_result row">
                       <div class="ranking_result_img col-md-4">
                         <v-lazy-image :src="item.img" :src-placeholder="item.img" ></v-lazy-image>
                       </div>
                       <div class="ranking_result_content col-md-8">
                         <h2>{{ item.no }}位　{{ item.name }}</h2>
-                        <p>{{ item.jenle }}</p>
+                        <p>{{ item.jenre }}</p>
+                        <p class="address">{{ item.address }}</p>
                       </div>
                   </li>
                 </a>
@@ -44,7 +48,41 @@
                       </div>
                       <div class="ranking_result_content col-md-8">
                         <h2>{{ item.no }}位　{{ item.name }}</h2>
+                        <p>{{ item.jenre }}</p>
+                        <p>{{ item.address }}</p>
                       </div>
+                  </li>
+                </a>
+              </template>
+            </ul>
+            <paginate
+              :page-count="getPageCount"
+              :page-range="3"
+              :margin-pages="2"
+              :click-handler="clickCallback"
+              :prev-text="'＜'"
+              :next-text="'＞'"
+              :container-class="'pagination'"
+              :page-class="'page-item'">
+            </paginate>
+          </div>
+        </div>
+
+        <div class="rankings tabelog_rankings">
+          <div class="ranking_results" id="ranking" style="padding-top:50px;">
+            <h3 style="padding:10px 0px;"><%= params[:area] %>のRettyランキング</h3>
+            <ul>
+              <template v-for="item in getRettyItems">
+                <a :href="item.href">
+                  <li class="ranking_result row">
+                      <div class="ranking_result_img col-md-4">
+                        <v-lazy-image :src="item.img" :src-placeholder="item.img" ></v-lazy-image>
+                      </div>
+                      <div class="ranking_result_content col-md-8">
+                        <h2>{{ item.no }}位　{{ item.name }}</h2>
+                        <p>{{ item.jenre }}</p>
+                      </div>
+
                   </li>
                 </a>
               </template>
@@ -66,32 +104,47 @@
   </div>
 </div>
 
+</script>
+<%= javascript_include_tag "map.js" %>
+<script src="https://maps.googleapis.com/maps/api/js?language=ja&region=JP&key=AIzaSyCpM_NXjd2FB5C8spyddfKd9rDDVndEIkA&callback=initMap" async defer></script>
+
 <script type="text/javascript">
+
+    var tabelogshopdata = [
+      <% @cnt = 1
+      @tabelogshops.each do |shop| %>
+          {no: <%= @cnt %>, name: "<%= shop.name %>", href: "<%= shop.url %>", img: "<%= shop.img %>", address:"<%= shop.address %>", jenre: "<%= shop.jenre %>"},
+      <% @cnt += 1
+      end %>
+    ];
+    var ikkyushopdata = [
+      <% @cnt = 1
+      @ikkyushops.each do |shop| %>
+          {no: <%= @cnt %>, name: "<%= shop.name %>", href: "<%= shop.url %>", img: "<%= shop.img %>", address:"<%= shop.address %>", jenre: "<%= shop.jenre %>"},
+      <% @cnt += 1
+      end %>
+    ];
+    var rettyshopdata = [
+      <% @cnt = 1
+      @rettyshops.each do |shop| %>
+          {no: <%= @cnt %>, name: "<%= shop.name %>", href: "<%= shop.url %>", img: "<%= shop.img %>", jenre: "<%= shop.jenre %>"},
+      <% @cnt += 1
+      end %>
+    ];
 
     const VLazyImagePlugin = window['VLazyImage'].VLazyImagePlugin;
     Vue.use(VLazyImagePlugin);
 
     Vue.component('paginate', VuejsPaginate)
 
-    new Vue({
+    var vm = new Vue({
        el: '#ranking',
        data: {
          parPage: 5,
          currentPage: 1,
-         tabelogitems: [
-           <% @cnt = 1
-           @tabeloghops.each do |shop| %>
-               {no: <%= @cnt %>, name: "<%= shop.name %>", href: "<%= shop.url %>", img: "<%= shop.img %>", jenle: "<%= shop.jenre %>"},
-           <% @cnt += 1
-           end %>
-         ],
-         ikkyuitems: [
-           <% @cnt = 1
-           @ikkyushops.each do |shop| %>
-               {no: <%= @cnt %>, name: "<%= shop.name %>", href: "<%= shop.url %>", img: "<%= shop.img %>", jenle: "<%= shop.jenre %>"},
-           <% @cnt += 1
-           end %>
-         ]
+         tabelogitems: tabelogshopdata,
+         ikkyuitems: ikkyushopdata,
+         rettyitems: rettyshopdata
        },
        methods: {
         clickCallback: function (pageNum) {
@@ -109,9 +162,78 @@
           let start = current - this.parPage;
           return this.ikkyuitems.slice(start, current);
         },
+          getRettyItems: function() {
+           let current = this.currentPage * this.parPage;
+           let start = current - this.parPage;
+           return this.rettyitems.slice(start, current);
+         },
          getPageCount: function() {
           return Math.ceil(this.tabelogitems.length / this.parPage);
         },
        }
      })
+
+
+
+    var map = new google.maps.Map(document.getElementById("tabelog_map_canvas"), opts);
+    var marker = [];
+    var infoWindow = [];
+    var geocoder = new google.maps.Geocoder();
+
+
+    function initMap() {
+      geocoder.geocode({'address': tabelogshopdata[0]['address']}, function(results, status) {
+       // 地図の作成
+       if (status === 'OK' && results[0]) {
+         //results[0].geometry.location に緯度・経度のオブジェクトが入っている
+         map_center = results[0].geometry.location;
+         //地図の中心位置を設定
+         map.setCenter(map_center);
+         //マーカーのインスタンスを生成
+         var marker = new google.maps.Marker({
+           //マーカーを配置する Map オブジェクトを指定
+           map: map,
+           //マーカーの初期の場所を示す LatLng を指定
+           position: map_center,
+           //マーカーをアニメーションで表示
+           animation: google.maps.Animation.DROP,
+           title: title
+         });
+         };
+       };
+
+       // マーカー毎の処理
+       for (var i = 0; i < tabelogshopdata.length; i++) {
+           geocoder.geocode({'address': tabelogshopdata[i]['address']}, function(results, status) {
+             if (status === 'OK' && results[0]) {
+                map_location = results[i].geometry.location;
+                marker[i] = new google.maps.Marker({ // マーカーの追加
+                 position: map_center, // マーカーを立てる位置を指定
+                    map: map // マーカーを立てる地図を指定
+               });
+
+               infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+                   content: '<div class="sample">' + tabelogshopdata[i]['name'] + '</div>' // 吹き出しに表示する内容
+                 });
+
+               markerEvent(i); // マーカーにクリックイベントを追加
+             };
+           };
+       };
+
+         marker[0].setOptions({// TAM 東京のマーカーのオプション設定
+              icon: {
+               url: tabelogitems[0]['icon']// マーカーの画像を変更
+             }
+         });
+     };
+    };
+
+    マーカーにクリックイベントを追加
+    function markerEvent(i) {
+        marker[i].addListener('click', function() { // マーカーをクリックしたとき
+          infoWindow[i].open(map, marker[i]); // 吹き出しの表示
+      });
+    };
+
 </script>

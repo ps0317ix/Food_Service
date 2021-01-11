@@ -1,5 +1,6 @@
 require "open-uri"
 require "nokogiri"
+# require 'watir-webdriver'
 
 class PlaceController < ApplicationController
 
@@ -24,53 +25,14 @@ class PlaceController < ApplicationController
       service: params[:service]
     )
     link = params[:url]
-    charset = nil
-    html = open(link) do |page|
-      #charsetを自動で読み込み、取得
-      charset = page.charset
-      #中身を読む
-      page.read
-    end
-    @Doc = Nokogiri::HTML(open(link))
+
 
     if params[:service] == "食べログ"
-      @tabelogContents = @Doc.xpath("//div[@class='list-rst__wrap js-open-new-window']")
-      @tabelogContents.each do |content|
-        @tabelogTitle = content.xpath(".//a[@class='list-rst__rst-name-target cpy-rst-name js-ranking-num']")
-        @tabeloghref = @tabelogTitle.attribute("href")
-        charset = nil
-        html = open(@tabeloghref) do |page|
-          charset = page.charset
-          page.read
-        end
-        @tabelogDoc = Nokogiri::HTML(open(@tabeloghref))
-        @tabelogImg = @tabelogDoc.css("img.p-main-photos__slider-image").attribute("src")
-        if not @tabelogImg
-          @tabelogImg = @tabelogDoc.css("a.js-imagebox-trigger img").attribute('src')
-        end
-        @tabelogJenre = @tabelogDoc.at_css('#rst-data-head > table:nth-child(2) > tbody > tr:nth-child(3) > td > span > text()')
-        @Shops = Shop.new(name: @tabelogTitle.inner_text, url: @tabeloghref, area: params[:area], service: params[:service], img: @tabelogImg, jenre: @tabelogJenre)
-        @Shops.save
-      end
+      Place.tabelogScraping(params[:area], params[:service], link)
     elsif params[:service] == '一休'
-      @ikkyuContents = @Doc.xpath("//section[@class='restaurantCard_jpBMy']")
-      @ikkyuContents.each do |content|
-        @ikkyuhref = content.xpath(".//a[@class='cover_3Ae77']").attribute("href")
-        @ikkyuhref = 'https://restaurant.ikyu.com' + @ikkyuhref
-        @ikkyuTitle = content.xpath(".//h3[@class='restaurantName_2s_sg']").text.gsub(' ', '').gsub(/[\r\n]/,"")
-        # charset = nil
-        # html = open(@ikkyuhref) do |page|
-        #   charset = page.charset
-        #   page.read
-        # end
-        # @ikkyuDoc = Nokogiri::HTML(open(@ikkyuhref))
-        # @ikkyuChildContents = @ikkyuDoc.at_css("div.carousel-slide")
-        @ikkyuImg = content.xpath(".//img[@class='image_3ZIQh']/@src")
-        # @ikkyuImg = @ikkyuDoc.search("._3hz4-Nr").map{ |n| n['style'][/url\((.+)\)/, 1] }
-        @ikkyuJenre = content.xpath(".//div[@class='retaurantArea_s9Crj']").text.gsub(' ', '').gsub(/[\r\n]/,"")
-        @Shops = Shop.new(name: @ikkyuTitle, url: @ikkyuhref, area: params[:area], service: params[:service], img: @ikkyuImg, jenre: @ikkyuJenre)
-        @Shops.save
-      end
+      Place.ikkyuScraping(params[:area], params[:service], link)
+    elsif params[:service] == 'Retty'
+      Place.rettyScraping(params[:area], params[:service], link)
     end
 
     if @place.save
@@ -107,55 +69,16 @@ class PlaceController < ApplicationController
     @shops = Shop.where(area: @place.area).where(service: @place.service)
 
     link = @place.url
-    charset = nil
-    html = open(link) do |page|
-      #charsetを自動で読み込み、取得
-      charset = page.charset
-      #中身を読む
-      page.read
-    end
-    @Doc = Nokogiri::HTML(open(link))
 
-    if params[:service] == "食べログ"
+    if @place.service == "食べログ"
       @shops.destroy_all
-      @tabelogContents = @Doc.xpath("//div[@class='list-rst__wrap js-open-new-window']")
-      @tabelogContents.each do |content|
-        @tabelogTitle = content.xpath(".//a[@class='list-rst__rst-name-target cpy-rst-name js-ranking-num']")
-        @tabeloghref = @tabelogTitle.attribute("href")
-        charset = nil
-        html = open(@tabeloghref) do |page|
-          charset = page.charset
-          page.read
-        end
-        @tabelogDoc = Nokogiri::HTML(open(@tabeloghref))
-        @tabelogImg = @tabelogDoc.css("img.p-main-photos__slider-image").attribute("src")
-        if not @tabelogImg
-          @tabelogImg = @tabelogDoc.css("a.js-imagebox-trigger img").attribute('src')
-        end
-        @tabelogJenre = @tabelogDoc.at_css('#rst-data-head > table:nth-child(2) > tbody > tr:nth-child(3) > td > span > text()')
-        @shop = Shop.new(name: @tabelogTitle.inner_text, url: @tabeloghref, area: params[:area], service: params[:service], img: @tabelogImg, jenre: @tabelogJenre)
-        @shop.save
-      end
-    elsif params[:service] == '一休'
+      Place.tabelogScraping(@place.area, @place.service, link)
+    elsif @place.service == '一休'
       @shops.destroy_all
-      @ikkyuContents = @Doc.xpath("//section[@class='restaurantCard_jpBMy']")
-      @ikkyuContents.each do |content|
-        @ikkyuhref = content.xpath(".//a[@class='cover_3Ae77']").attribute("href")
-        @ikkyuhref = 'https://restaurant.ikyu.com' + @ikkyuhref
-        @ikkyuTitle = content.xpath(".//h3[@class='restaurantName_2s_sg']").text.gsub(' ', '').gsub(/[\r\n]/,"")
-        # charset = nil
-        # html = open(@ikkyuhref) do |page|
-        #   charset = page.charset
-        #   page.read
-        # end
-        # @ikkyuDoc = Nokogiri::HTML(open(@ikkyuhref))
-        # @ikkyuChildContents = @ikkyuDoc.at_css("div.carousel-slide")
-        @ikkyuImg = content.xpath(".//img[@class='image_3ZIQh']/@src")
-        # @ikkyuImg = @ikkyuDoc.search("._3hz4-Nr").map{ |n| n['style'][/url\((.+)\)/, 1] }
-        @ikkyuJenre = content.xpath(".//div[@class='retaurantArea_s9Crj']").text.gsub(' ', '').gsub(/[\r\n]/,"")
-        @shop = Shop.new(name: @ikkyuTitle, url: @ikkyuhref, area: params[:area], service: params[:service], img: @ikkyuImg, jenre: @ikkyuJenre)
-        @shop.save
-      end
+      Place.ikkyuScraping(@place.area, @place.service, link)
+    elsif @place.service == 'Retty'
+      @shops.destroy_all
+      Place.rettyScraping(@place.area, @place.service, link)
     end
 
     flash[:notice] = "地域更新が完了しました"
@@ -166,22 +89,22 @@ class PlaceController < ApplicationController
   def show
     @places = Place.where(name: params[:name])
     @Shops = Shop.where(area: params[:area])
-    @tabeloghops = Shop.where(area: params[:area]).where(service: "食べログ")
+    @tabelogshops = Shop.where(area: params[:area]).where(service: "食べログ")
     @ikkyushops = Shop.where(area: params[:area]).where(service: "一休")
+    @rettyshops = Shop.where(area: params[:area]).where(service: "Retty")
   end
 
 
   def search
     @allPlaces = Place.all
     @tabelogs = Place.where(service: "食べログ")
+    @ikkyus = Place.where(service: "一休")
 
     if params[:search]
       @places = Place.search(params[:search])
       @tabeloghops = Shop.where(area: params[:search]).where(service: "食べログ")
       @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
-      # @tabelogContents = Place.tabelogContents(params[:search])
-      # @rettyContents = Place.rettyContents(params[:search])
-      # @ikkyuContents = Place.ikkyuContents(params[:search])
+      @rettyshops = Shop.where(area: params[:search]).where(service: "Retty")
     else
       @places = Place.all
       # @Shops = Shop.all
@@ -191,6 +114,8 @@ class PlaceController < ApplicationController
   def search_exe
     @places = Place.search(params[:search])
     @Shops = Shop.where(area: params[:search])
+    @tabeloghops = Shop.where(area: params[:search]).where(service: "食べログ")
+    @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
     # @services = Place.services(params[:search])
     # @tabelogTitles = Place.tabelogTitles(params[:search])
     # @rettyTitles = Place.rettyTitles(params[:search])

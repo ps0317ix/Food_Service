@@ -5,6 +5,12 @@ class HomeController < ApplicationController
 
   def index
     @allPlaces = Place.all
+    @tabelogPlaces = Place.where(service: "食べログ")
+    @ikkyuPlaces = Place.where(service: "一休")
+
+    @tabeloghops = Shop.where(area: params[:area]).where(service: "食べログ")
+    @ikkyushops = Shop.where(area: params[:area]).where(service: "一休")
+    
     # if @allPlaces
       @tabelogUrl = 'https://tabelog.com/tokyo/rstLst/?SrtT=rt&Srt=D&sort_mode=1'
       charset = nil
