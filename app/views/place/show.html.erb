@@ -175,65 +175,45 @@
 
 
 
-    var map = new google.maps.Map(document.getElementById("tabelog_map_canvas"), opts);
+    var map = new google.maps.Map(document.getElementById('tabelog_map_canvas'), {
+         geocoder.geocode({
+           'address': '〒160-0022 東京都新宿区新宿３丁目３８−１'
+         }, function(results, status) {
+           if (status === google.maps.GeocoderStatus.OK) { // ステータスがOKの場合
+              centerposition = results[0].geometry.location, // マーカーを立てる位置を指定
+            };
+         });
+         center: results[0].geometry.location, // 地図の中心を指定
+         zoom: 15 // 地図のズームを指定
+     });
     var marker = [];
     var infoWindow = [];
     var geocoder = new google.maps.Geocoder();
 
 
     function initMap() {
-      geocoder.geocode({'address': tabelogshopdata[0]['address']}, function(results, status) {
-       // 地図の作成
-       if (status === 'OK' && results[0]) {
-         //results[0].geometry.location に緯度・経度のオブジェクトが入っている
-         map_center = results[0].geometry.location;
-         //地図の中心位置を設定
-         map.setCenter(map_center);
-         //マーカーのインスタンスを生成
-         var marker = new google.maps.Marker({
-           //マーカーを配置する Map オブジェクトを指定
-           map: map,
-           //マーカーの初期の場所を示す LatLng を指定
-           position: map_center,
-           //マーカーをアニメーションで表示
-           animation: google.maps.Animation.DROP,
-           title: title
-         });
-         };
-       };
-
-       // マーカー毎の処理
-       for (var i = 0; i < tabelogshopdata.length; i++) {
-           geocoder.geocode({'address': tabelogshopdata[i]['address']}, function(results, status) {
-             if (status === 'OK' && results[0]) {
-                map_location = results[i].geometry.location;
-                marker[i] = new google.maps.Marker({ // マーカーの追加
-                 position: map_center, // マーカーを立てる位置を指定
-                    map: map // マーカーを立てる地図を指定
-               });
-
-               infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
-                   content: '<div class="sample">' + tabelogshopdata[i]['name'] + '</div>' // 吹き出しに表示する内容
-                 });
-
-               markerEvent(i); // マーカーにクリックイベントを追加
-             };
-           };
-       };
-
-         marker[0].setOptions({// TAM 東京のマーカーのオプション設定
-              icon: {
-               url: tabelogitems[0]['icon']// マーカーの画像を変更
-             }
-         });
-     };
-    };
-
-    マーカーにクリックイベントを追加
-    function markerEvent(i) {
-        marker[i].addListener('click', function() { // マーカーをクリックしたとき
-          infoWindow[i].open(map, marker[i]); // 吹き出しの表示
-      });
-    };
+       geocoder = new google.maps.Geocoder();
+       for (var i = 0; i < addresses.length; i++) {
+          geocoder.geocode({
+              'address': tabelogshopdata[i]['address']
+           }, function(results, status) { // 結果
+                if (status === google.maps.GeocoderStatus.OK) { // ステータスがOKの場合
+                 marker = new google.maps.Marker({
+                       position: results[0].geometry.location, // マーカーを立てる位置を指定
+                        map: map // マーカーを立てる地図を指定
+                   });
+             } else { // 失敗した場合
+                  alert(status);
+              }
+           });
+      };
+    }
+    //
+    // // マーカーにクリックイベントを追加
+    // function markerEvent(i) {
+    //     marker[i].addListener('click', function() { // マーカーをクリックしたとき
+    //       infoWindow[i].open(map, marker[i]); // 吹き出しの表示
+    //   });
+    // };
 
 </script>
