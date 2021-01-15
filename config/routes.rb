@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  get 'clickcnts/index'
+  get 'clickcnts/show'
   # TOP
   get '/' => 'home#index'
 
@@ -24,6 +26,7 @@ Rails.application.routes.draw do
   get "place/edit" => 'place#edit'
   post "place/:id/update" => 'place#update'
   post "place/:id/delete" => 'place#delete'
+  get "place/:area/edit" => 'place#edit_shop'
   get "place/:area" => 'place#show'
 
   # 検索関連

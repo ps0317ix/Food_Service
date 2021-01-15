@@ -152,10 +152,11 @@
   /* map関連 */
   .map_container {
     clear: both;
-    width: 90%;
+    width: 100%;
     padding: 4px;
     border: 1px solid #CCC;
   }
+
   .map_canvas {
     width: 100%;
     height: 500px;
@@ -171,6 +172,37 @@
   }
 
   #tabelog_map_canvas{
-    width: 700px;
-    height: 400px;
+    width: 100%;
+    height: 890px;
+  }
+
+  .map_window{
+    width: 400px;
+    text-align: left;
+  }
+
+  .map_window a{
+    text-decoration: none;
+  }
+
+  .map_window a p{
+    text-decoration: none;
+  }
+
+  .map_window img{
+    width: 400px;
+    object-fit: cover;
+  }
+
+
+  .ranking_result{
+    /* opacity: 0.4; */
+  }
+
+  .passive{
+    opacity: 0.5;
+  }
+
+  .active{
+    opacity: 1;
   }

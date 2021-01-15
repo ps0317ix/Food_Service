@@ -19,12 +19,16 @@ class PlaceController < ApplicationController
 
 
   def create
+
+    @address = Geocoder.search(params[:area])
+    link = params[:url]
+
     @place = Place.new(
       area: params[:area],
-      url: params[:url],
-      service: params[:service]
+      url: link,
+      service: params[:service],
+      address: @address
     )
-    link = params[:url]
 
 
     if params[:service] == "食べログ"
@@ -47,6 +51,12 @@ class PlaceController < ApplicationController
 
   def edit
     @allPlaces = Place.all
+  end
+
+  def edit_shop
+    @allPlaces = Place.all
+    @allShops = Shop.where(area: params[:area])
+    @allShopsAddress = Shop.where(area: params[:area]).where.not(address: nil)
   end
 
 
@@ -82,16 +92,22 @@ class PlaceController < ApplicationController
     end
 
     flash[:notice] = "地域更新が完了しました"
-    redirect_to("/place/edit")
+    redirect_to("/place/#{@place.area}/edit")
   end
 
 
   def show
-    @places = Place.where(name: params[:name])
+    @places = Place.where(area: params[:area])
+    @placeinfo = @places.find_by(service: "食べログ")
     @Shops = Shop.where(area: params[:area])
     @tabelogshops = Shop.where(area: params[:area]).where(service: "食べログ")
     @ikkyushops = Shop.where(area: params[:area]).where(service: "一休")
     @rettyshops = Shop.where(area: params[:area]).where(service: "Retty")
+    # @clickcnt = Clickcnt.find_by()
+  end
+
+  def clickcntdb
+    @clickcntdb = Place.clickcnt(params[:area], service, shopname)
   end
 
 

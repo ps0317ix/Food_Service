@@ -4,10 +4,11 @@
     <title>FoodService</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= include_gon %>
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-    
+
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/v-lazy-image@1.4.0/dist/v-lazy-image.min.js"></script>
@@ -25,7 +26,7 @@
       <ul>
         <li>
           <div class="">
-            <%= link_to "Food_App", "/" %>
+            <%= link_to "のぐろぐ", "/" %>
           </div>
         </li>
         <li>
@@ -64,4 +65,5 @@
 
 
   </body>
+  <script src="https://maps.googleapis.com/maps/api/js?language=ja&region=JP&key=AIzaSyCpM_NXjd2FB5C8spyddfKd9rDDVndEIkA&callback=initMap" async defer></script>
 </html>

@@ -1,4 +1,10 @@
+
+require "geocoder"
+
 class Place < ApplicationRecord
+
+  geocoded_by :address
+  after_validation :geocode
 
   def self.search(search)
     if search
@@ -23,7 +29,7 @@ class Place < ApplicationRecord
       @tabelogTitle = content.xpath(".//a[@class='list-rst__rst-name-target cpy-rst-name js-ranking-num']")
       @tabeloghref = @tabelogTitle.attribute("href")
       charset = nil
-      # 書く詳細ページ内の情報をスクレイピング
+      # 各店舗の詳細ページをスクレイピング
       html = open(@tabeloghref) do |page|
         charset = page.charset
         page.read
@@ -31,12 +37,21 @@ class Place < ApplicationRecord
       @tabelogDoc = Nokogiri::HTML(open(@tabeloghref))
       @tabelogAddress = @tabelogDoc.xpath('.//p[@class="rstinfo-table__address"]').text
       @tabelogImg = @tabelogDoc.css("img.p-main-photos__slider-image").attribute("src")
+      @tabelogCloseDate = @tabelogDoc.xpath('.//dd[@id="short-comment"]').text.gsub(' ', '').gsub(/[\r\n]/,"")
+      @tabelogShopTime = @tabelogDoc.xpath('.//*[@id="rst-data-head"]/table[1]/tbody/tr[8]/td/p[2]').text
       if not @tabelogImg
         @tabelogImg = @tabelogDoc.css("a.js-imagebox-trigger img").attribute('src')
       end
       @tabelogJenre = @tabelogDoc.at_css('#rst-data-head > table:nth-child(2) > tbody > tr:nth-child(3) > td > span > text()')
-      @Shops = Shop.new(name: @tabelogTitle.inner_text, url: @tabeloghref, area: area, service: service, img: @tabelogImg, jenre: @tabelogJenre, address: @tabelogAddress)
+      @Shops = Shop.new(name: @tabelogTitle.inner_text, url: @tabeloghref, area: area, service: service, img: @tabelogImg, jenre: @tabelogJenre, address: @tabelogAddress, week:@tabelogCloseDate ,time:@tabelogShopTime)
       @Shops.save
+      @clickcnt = Clickcnt.new(
+        click: 0,
+        area: area,
+        service: service,
+        shop: @tabelogTitle.inner_text
+      )
+      @clickcnt.save
     end
   end
 
@@ -69,8 +84,23 @@ class Place < ApplicationRecord
       @ikkyuDetail = content.xpath(".//div[@class='retaurantArea_s9Crj']").text.gsub(' ', '').gsub(/[\r\n]/,"")
       @ikkyuStation = @ikkyuDetail.split(/／/)[0]
       @ikkyuJenre = @ikkyuDetail.split(/／/)[1]
-      @shop = Shop.new(name: @ikkyuTitle, url: @ikkyuhref, area: area, service: service, img: @ikkyuImg, jenre: @ikkyuJenre, address: @ikkyuAddress)
+      @shop = Shop.new(
+        name: @ikkyuTitle,
+        url: @ikkyuhref,
+        area: area,
+        service: service,
+        img: @ikkyuImg,
+        jenre: @ikkyuJenre,
+        address: @ikkyuAddress
+      )
       @shop.save
+      @clickcnt = Clickcnt.new(
+        click: 0,
+        area: area,
+        service: service,
+        shop: @ikkyuTitle
+      )
+      @clickcnt.save
     end
   end
 
@@ -93,7 +123,20 @@ class Place < ApplicationRecord
       @rettyJenre = content.xpath(".//dd[@class='information-list__description']").text.split('）')[1].gsub(/[\r\n]/,"")
       @Shops = Shop.new(name: @rettyTitle, url: @rettyhref, area: area, service: service, img: @rettyImg, jenre: @rettyJenre)
       @Shops.save
+      @clickcnt = Clickcnt.new(
+        click: 0,
+        area: area,
+        service: service,
+        shop: @rettyTitle
+      )
+      @clickcnt.save
     end
+  end
+
+  def self.clickcnt(area, service, shopname)
+      @clickcnt = Clickcnt.where(area: area).where(service: service).find_by(shop:shopname).click
+      @click = @clickcnt.click + 1
+      @clickcnt.update(click: @click)
   end
 
 end

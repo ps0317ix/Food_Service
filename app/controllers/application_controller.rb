@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
 
   before_action :set_current_user
 
-  
+
 
   def set_current_user
     @current_user = User.find_by(id: session[:user_id])
@@ -22,6 +22,10 @@ class ApplicationController < ActionController::Base
       flash[:notice] = "すでにログインしています"
       redirect_to("/posts/index")
     end
+  end
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:email, :name, :address])
   end
 
 

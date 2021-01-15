@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_09_144123) do
+ActiveRecord::Schema.define(version: 2021_01_15_112444) do
+
+  create_table "clickcnts", force: :cascade do |t|
+    t.integer "click"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "shop"
+    t.string "area"
+    t.string "service"
+  end
 
   create_table "places", force: :cascade do |t|
     t.string "area"
@@ -18,6 +27,9 @@ ActiveRecord::Schema.define(version: 2021_01_09_144123) do
     t.string "service"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "address"
+    t.float "latitude"
+    t.float "longitude"
   end
 
   create_table "shops", force: :cascade do |t|
@@ -30,6 +42,10 @@ ActiveRecord::Schema.define(version: 2021_01_09_144123) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "address"
+    t.float "latitude"
+    t.float "longitude"
+    t.string "week"
+    t.string "time"
   end
 
   create_table "users", force: :cascade do |t|

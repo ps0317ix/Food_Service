@@ -1,0 +1,108 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+
+<div class="main user-show">
+  <div class="container">
+    <div class="table__wrapper" style="padding-top:50px;">
+    <h1><%= params[:area] %>エリア一覧</h1>
+    <div id="map_canvas" style="width:800px height:600px;"></div>
+    <table class="table is-bordered pricing__table is-fullwidth" id="el">
+      <tr>
+        <td><p>No.</p></td>
+        <td><p>店舗名</p></td>
+        <td><p>サービス名</p></td>
+        <td><p>住所</p></td>
+        <td><p>営業時間</p></td>
+        <td><p>定休日</p></td>
+        <td><p>作成日時</p></td>
+        <td><p>更新日時</p></td>
+        <td><p>更新</p></td>
+        <td><p>削除</p></td>
+      </tr>
+      <% @cnt = 1
+      @allShops.each do |shop| %>
+        <tr>
+          <td><p><%= @cnt %></p></td>
+          <td><p><%= shop.name %></p></td>
+          <td><p><%= shop.service %></p></td>
+          <td><p><%= shop.address %></p></td>
+          <td><p><%= shop.time %></p></td>
+          <td><p><%= shop.week %></p></td>
+          <td><p><%= shop.created_at %></p></td>
+          <td><p><%= shop.updated_at %></p></td>
+          <td>
+            <%= form_tag("/place/#{shop.id}/update", class:"button is-primary", multipart: true) do %>
+              <input type="submit" value="更新">
+            <% end %>
+          </td>
+          <td>
+            <%= form_tag("/place/#{shop.id}/delete",class:"button is-danger", multipart: true) do %>
+              <input type="submit" value="削除">
+            <% end %>
+          </td>
+        </tr>
+      <% @cnt += 1
+      end %>
+    </table>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  var addresses = (
+    <% @allShopsAddress.each do |address| %>
+      "<%= address.address %>",
+    <% end %>
+  )
+
+
+
+  for(var i=0; i<addresses.length; i++){
+    address = addresses[i]
+    console.console.log(address);
+    initMap();
+  }
+
+  function initMap() {
+
+    // center は Geolocation から取得して後で設定
+    var opts = {
+      zoom: zoom,
+      mapTypeId: "roadmap"  //初期マップ タイプ
+    };
+
+    //マップのインスタンスを生成
+    map = new google.maps.Map(document.getElementById("map_canvas"), opts);
+
+    //ジオコーディングのインスタンスの生成
+    var geocoder = new google.maps.Geocoder();
+
+    //geocoder.geocode() にアドレスを渡して、コールバック関数を記述して処理
+      geocoder.geocode({
+        'address': address
+      }, function(results, status) {
+        if (status === 'OK' && results[0]) {
+          //results[0].geometry.location に緯度・経度のオブジェクトが入っている
+          LatLng = results[0].geometry.location;
+          console.log(LatLng);
+
+          //地図の中心位置を設定
+          map.setCenter(LatLng);
+          //マーカーのインスタンスを生成
+          var marker = new google.maps.Marker({
+            //マーカーを配置する Map オブジェクトを指定
+            map: map,
+            //マーカーの初期の場所を示す LatLng を指定
+            position: LatLng,
+            //マーカーをアニメーションで表示
+            animation: google.maps.Animation.DROP,
+            title: title
+          });
+
+        } else {
+          alert("住所から位置の取得ができませんでした。: " + status);
+        }
+      })
+  }
+</script>

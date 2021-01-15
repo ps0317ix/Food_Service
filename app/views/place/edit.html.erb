@@ -3,7 +3,7 @@
 <div class="main user-show">
   <div class="container">
     <div class="table__wrapper" style="padding-top:50px;">
-    <h1>エリア一覧</h1>
+    <h1>店舗更新可能エリア一覧</h1>
     <table class="table is-bordered pricing__table is-fullwidth">
       <tr>
         <td><p>No.</p></td>
@@ -18,7 +18,7 @@
       @allPlaces.each do |place| %>
         <tr>
           <td><p><%= @cnt %></p></td>
-          <td><p><%= link_to place.area, "/place/#{place.area}" %></p></td>
+          <td><p><%= link_to place.area, "/place/#{place.area}/edit" %></p></td>
           <td><p><%= place.service %></p></td>
           <td><p><%= place.created_at %></p></td>
           <td><p><%= place.updated_at %></p></td>
