@@ -8,6 +8,7 @@
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag "jquery.cookie.js" %>
 
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
@@ -15,6 +16,7 @@
     <script src="https://unpkg.com/vuejs-paginate@2.1.0"></script>
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css">
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.4/js.cookie.min.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -63,7 +65,24 @@
     <%= yield %>
 
 
+    <footer>
+      <div class="container">
+        <div class="footer_links">
+          <h3>食べログ</h3>
+          <ul>
+          <%
+            if @tabelogPlaces
+              @tabelogPlaces.each do |place|
+          %>
+              <li style=""><%= link_to "#{place.area}", "place/#{place.area}/ranking" %></li>
+          <%
+              end
+            end
+          %>
+          </ul>
 
+      </div>
+    </footer>
   </body>
   <script src="https://maps.googleapis.com/maps/api/js?language=ja&region=JP&key=AIzaSyCpM_NXjd2FB5C8spyddfKd9rDDVndEIkA&callback=initMap" async defer></script>
 </html>

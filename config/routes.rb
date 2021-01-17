@@ -27,7 +27,7 @@ Rails.application.routes.draw do
   post "place/:id/update" => 'place#update'
   post "place/:id/delete" => 'place#delete'
   get "place/:area/edit" => 'place#edit_shop'
-  get "place/:area" => 'place#show'
+  get "place/:area/ranking" => 'place#show'
 
   # 検索関連
   get "search_exe" => 'place#search'

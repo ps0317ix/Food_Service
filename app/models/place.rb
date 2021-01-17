@@ -15,6 +15,7 @@ class Place < ApplicationRecord
   end
 
 
+  # 食べログの「ランキングページ」から情報取得
   def self.tabelogScraping(area, service, link)
     charset = nil
     html = open(link) do |page|
@@ -38,7 +39,7 @@ class Place < ApplicationRecord
       @tabelogAddress = @tabelogDoc.xpath('.//p[@class="rstinfo-table__address"]').text
       @tabelogImg = @tabelogDoc.css("img.p-main-photos__slider-image").attribute("src")
       @tabelogCloseDate = @tabelogDoc.xpath('.//dd[@id="short-comment"]').text.gsub(' ', '').gsub(/[\r\n]/,"")
-      @tabelogShopTime = @tabelogDoc.xpath('.//*[@id="rst-data-head"]/table[1]/tbody/tr[8]/td/p[2]').text
+      @tabelogShopTime = @tabelogDoc.xpath('.//*[@id="rst-data-head"]/table[1]/tbody/tr[8]/td/p[2]').text.gsub('&lt;', '<').gsub('&gt;', '>')
       if not @tabelogImg
         @tabelogImg = @tabelogDoc.css("a.js-imagebox-trigger img").attribute('src')
       end
@@ -56,6 +57,7 @@ class Place < ApplicationRecord
   end
 
 
+  # 一休の「ランキングページ」から情報取得
   def self.ikkyuScraping(area, service, link)
     charset = nil
     html = open(link) do |page|
@@ -105,6 +107,7 @@ class Place < ApplicationRecord
   end
 
 
+  # Rettyの「ランキングページ」から情報取得
   def self.rettyScraping(area, service, link)
     charset = nil
     html = open(link) do |page|

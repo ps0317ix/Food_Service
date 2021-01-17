@@ -14,13 +14,15 @@
  *= require_self
  */
 
+ @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap');
+
 
  * {
    box-sizing: border-box;
  }
 
  html {
-   font: 100%/1.5 'Avenir Next', 'Hiragino Sans', sans-serif;
+   font: 100%/1.5 'Avenir Next', 'Noto Sans JP' 'Hiragino Sans', sans-serif;
    line-height: 1.7;
    letter-spacing: 1px;
  }
@@ -62,11 +64,11 @@
  }
 
  .main {
-   position: absolute;
-   top: 64px;
+   position: relative;
+   padding: 64px 0px;
    width: 100%;
    height: auto;
-   min-height: 100%;
+   min-height: 100vh;
    background-color: #f5f8fa;
  }
 
@@ -77,16 +79,32 @@
    position: absolute;
    z-index: 1;
    width: 100%;
-   background: rgb(255, 179, 0);
+   background: linear-gradient(0deg, rgba(255, 145, 8,0.7917542016806722) 0%, rgba(255, 145, 8,0.6) 100%);
  }
 
  header ul{
    display: flex;
    margin: 20px 0px 20px 10px;
+   color: #fff;
  }
 
  header li{
    margin: 0px 10px;
+   color: #fff;
+ }
+
+ header li form input[type="text"]{
+
+ }
+
+ header li a{
+   color: #fff;
+   text-decoration: none;
+ }
+
+ header li a:hover{
+   transition: 0.5s;
+   opacity: 0.8;
  }
 
  .header-logo {
@@ -148,6 +166,12 @@
    clear: both;
  }
 
+ .top-message{
+   width: 80%;
+   margin: auto;
+   text-align: center;
+ }
+
 
   /* map関連 */
   .map_container {
@@ -173,7 +197,7 @@
 
   #tabelog_map_canvas{
     width: 100%;
-    height: 890px;
+    height: 850px;
   }
 
   .map_window{
@@ -191,13 +215,37 @@
 
   .map_window img{
     width: 400px;
+    height: 300px;
     object-fit: cover;
+  }
+
+  .sort_btns{
+    padding: 10px 0px;
   }
 
 
   .ranking_result{
-    /* opacity: 0.4; */
+    width: 100%;
+    height: 200px;
+    border: 1px solid rgb(255, 179, 0);
+    background: #fff;
   }
+
+  .col-md-4{
+    padding: 0px;
+  }
+
+  .ranking_result_img img{
+    width: 100%;
+    height: 198px;
+    object-fit: cover;
+  }
+
+  .ranking_result_content{
+    text-align: left;
+    height: 200px;
+  }
+
 
   .passive{
     opacity: 0.5;
@@ -206,3 +254,25 @@
   .active{
     opacity: 1;
   }
+
+
+  footer{
+    position: relative;
+    bottom: 0;
+    width: 100%;
+  }
+
+
+   .footer_links ul li{
+      padding: 5px 10px;
+      border: 1px solid #337ab7;
+      margin: 0px 10px;
+      border-radius: 5px;
+      background-color: #fff;
+   }
+
+   .footer_links ul li a:hover{
+      transition: 0.5s;
+      opacity: 0.6;
+      text-decoration: none;
+   }

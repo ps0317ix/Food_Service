@@ -41,7 +41,7 @@ class PlaceController < ApplicationController
 
     if @place.save
       flash[:notice] = "地域登録が完了しました"
-      redirect_to("/place/#{@place.area}")
+      redirect_to("/place/#{@place.area}/ranking")
     else
       flash[:notice] = "地域登録が失敗しました"
       render("place/new")
@@ -118,7 +118,8 @@ class PlaceController < ApplicationController
 
     if params[:search]
       @places = Place.search(params[:search])
-      @tabeloghops = Shop.where(area: params[:search]).where(service: "食べログ")
+      @placeinfo = @places.find_by(service: "食べログ")
+      @tabelogshops = Shop.where(area: params[:search]).where(service: "食べログ")
       @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
       @rettyshops = Shop.where(area: params[:search]).where(service: "Retty")
     else
@@ -130,11 +131,10 @@ class PlaceController < ApplicationController
   def search_exe
     @places = Place.search(params[:search])
     @Shops = Shop.where(area: params[:search])
-    @tabeloghops = Shop.where(area: params[:search]).where(service: "食べログ")
+    @placeinfo = @places.find_by(service: "食べログ")
+    @tabelogshops = Shop.where(area: params[:search]).where(service: "食べログ")
     @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
-    # @services = Place.services(params[:search])
-    # @tabelogTitles = Place.tabelogTitles(params[:search])
-    # @rettyTitles = Place.rettyTitles(params[:search])
+    @rettyshops = Shop.where(area: params[:search]).where(service: "Retty")
   end
 
 
