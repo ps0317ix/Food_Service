@@ -14,7 +14,6 @@
                 <div class="sort_btns">
                   <button class="btn" @click="reverseSortShop()">元に戻す</button>
                   <button class="btn" @click="sortShop()">開店中のみ表示</button>
-                  <button class="btn" @click="readcookie()">cookie読み込み</button>
                 </div>
               </div>
               <div class="col-md-6">
@@ -160,31 +159,24 @@
     var cookieShopNames = [];  // cookieからクリックした店舗の配列を取得
     var cookieShopName;
 
-    // var cookies = document.cookie; // 全てのcookieを取り出して
-    // var cookiesArray = cookies.split(';'); // ;で分割し配列に
 
-    // shopnamesを無害化
-    // for(var c of cookiesArray){ //一つ一つ取り出して
-    //     var cArray = c.split('='); //さらに=で分割して配列に
-    //     if( cArray[0] == ' shopnames'){ // 取り出したいkeyと合致したら
-    //         cookieShopNames = cArray[1].replace("[", "").replace("]", "").split('","')
-    //     }
-    // }
-
-    cookieShopNames = Cookies.get('shopnames').replace("[", "").replace("]", "").split('","')
+    cookieShopNames = Cookies.get('shopnames');
+    console.log(cookieShopNames);
 
     // 無害化した店舗名を配列に格納し直す
-    if(cookieShopNames!=""){
+    if(cookieShopNames==null){
+      cookieShopNames = [];
+    }else{
+      cookieShopNames = cookieShopNames.replace("[", "").replace("]", "").split('","');
       var a = 0;
       var replaceShopNames = cookieShopNames
       cookieShopNames = [];
       for(var cookieShop of replaceShopNames){
         cookieShop = cookieShop.replace(/\"/g, "").replace(/\\/g, "") // サニタイジング
-        cookieShopNames.push(cookieShop);
+        cookieShopNames.unshift(cookieShop);
       }
     }
 
-    console.log(cookieShopNames);
 
 
      var marker = [];      // マーカーの配列
@@ -196,7 +188,7 @@
         var mapLatLng = new google.maps.LatLng({lat: arealat, lng: arealng});
         tabelogmap = new google.maps.Map(document.getElementById('tabelog_map_canvas'), { // #sampleに地図を埋め込む
           center: mapLatLng, // 地図の中心を指定
-           zoom: 15 // 地図のズームを指定
+           zoom: 16 // 地図のズームを指定
         });
         // マーカー毎の処理
         for (var i = 0; i < tabelogshopdata.length; i++) {
@@ -222,6 +214,7 @@
             fillOpacity: 0.8,
            }
         });
+        console.log(marker[i]);
         infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
             content: '<div class="map_window" style="z-index:"' + i + '";"><a href="' + tabelogshopdata[i]['href'] + '" style="text-decoration: none;"><h5>' + (i+1) + '位 ' + tabelogshopdata[i]['name'] + '</h5><p>' + tabelogshopdata[i]['address'] + '<br>' + tabelogshopdata[i]['jenre'] + '<br>定休日：' + tabelogshopdata[i]['week'] + '<br>営業時間：' + tabelogshopdata[i]['time'] + '</p><img src="' + tabelogshopdata[i]['img'] + '"></a></div>' // 吹き出しに表示する内容
           });
@@ -245,10 +238,16 @@
 
      // Cookie書き込み
      function writeCookie(i){
+       var cnt = 0
        cookieShopName = tabelogshopdata[i]['name']
-       console.log(cookieShopName);
-       cookieShopNames.push(cookieShopName)
-       console.log(cookieShopNames);
+       for(var compareShopName of cookieShopNames){
+         if(cookieShopName == compareShopName){
+           console.log('cookie書き込みスキップ');
+           exit;
+         }
+       }
+
+       cookieShopNames.unshift(cookieShopName)
        var json_str = JSON.stringify(cookieShopNames);
        console.log(json_str);
        // document.cookie = "shopnames=" + encodeURIComponent(json_str) + " expires=" + date.toUTCString() + "; path=/;"
@@ -300,11 +299,7 @@
                addMarker(y);
              }
            }
-         },
-         readcookie: function() {
-            var cookieValue = document.cookie;
-            console.log(cookieValue);
-          }
+         }
         },
         computed: {
           // ページネーション関連
@@ -333,5 +328,5 @@
            return Math.ceil(this.rettyitems.length / this.parPage);
          },
         }
-      })
+      });
 </script>

@@ -58,7 +58,6 @@
  /* 共通レイアウト ================================ */
  body {
    color: #2d3133;
-   background-color: rgb(255, 179, 0);
    margin: 0;
    min-height: 1vh;
  }
@@ -79,7 +78,7 @@
    position: absolute;
    z-index: 1;
    width: 100%;
-   background: linear-gradient(0deg, rgba(255, 145, 8,0.7917542016806722) 0%, rgba(255, 145, 8,0.6) 100%);
+   background-color: rgb(249, 179, 3);
  }
 
  header ul{
@@ -93,9 +92,6 @@
    color: #fff;
  }
 
- header li form input[type="text"]{
-
- }
 
  header li a{
    color: #fff;
@@ -143,13 +139,26 @@
    padding-right: 5px;
  }
 
- .header-menus input[type="submit"] {
-   padding: 0 20px;
-   float: left;
-   line-height: 64px;
-   color: white;
-   margin: 0;
-   font-size: 13px;
+ header ul li form input[type="text"]{
+   background-color: #fff;
+   width: 140px;
+   border-radius: 5px 0px 0px 5px;
+   background-color: #fff;
+   border: 1px solid rgb(255, 179, 0);
+
+ }
+
+ header ul li form input[type="submit"] {
+   border-radius: 0px 5px 5px 0px;
+   color: rgb(255, 179, 0);
+   background-color: #fff;
+   padding: 1px 10px;
+   margin: 0px -5px;
+ }
+
+ header ul li form input[type="submit"]:hover{
+   opacity: 0.4;
+   transition: 0.5s;
  }
 
  #header-app slide a{
@@ -170,6 +179,29 @@
    width: 80%;
    margin: auto;
    text-align: center;
+ }
+
+ .top-message form input[type="text"]{
+    height: 40px;
+    width: 250px;
+    border-radius: 5px 0px 0px 5px;
+    background-color: #fff;
+    border: 1px solid rgb(255, 179, 0);
+ }
+
+ .top-message form input[type="submit"]{
+    font-weight: bold;
+    height: 40px;
+    border-radius: 0px 5px 5px 0px;
+    color: #fff;
+    background: linear-gradient(0deg, rgba(255, 145, 8,0.7917542016806722) 0%, rgba(255, 145, 8,0.6) 100%);
+    padding: 0px 10px;
+    margin: 0px -5px;
+ }
+
+ .top-message form input[type="submit"]:hover{
+   opacity: 0.4;
+   transition: 0.5s;
  }
 
 
@@ -260,16 +292,21 @@
     position: relative;
     bottom: 0;
     width: 100%;
+    background: linear-gradient(0deg, rgba(255, 145, 8,0.7917542016806722) 0%, rgba(255, 145, 8,0.6) 100%);
   }
 
 
    .footer_links ul li{
       padding: 5px 10px;
-      border: 1px solid #337ab7;
+      border: 1px solid rgba(255, 145, 8);
       margin: 0px 10px;
       border-radius: 5px;
       background-color: #fff;
    }
+
+   .footer_links ul li a{
+      color: rgba(255, 145, 8);
+    }
 
    .footer_links ul li a:hover{
       transition: 0.5s;

@@ -119,6 +119,7 @@ class PlaceController < ApplicationController
     if params[:search]
       @places = Place.search(params[:search])
       @placeinfo = @places.find_by(service: "食べログ")
+      @tabelogPlaces = Place.where(service: "食べログ")
       @tabelogshops = Shop.where(area: params[:search]).where(service: "食べログ")
       @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
       @rettyshops = Shop.where(area: params[:search]).where(service: "Retty")
@@ -131,6 +132,7 @@ class PlaceController < ApplicationController
   def search_exe
     @places = Place.search(params[:search])
     @Shops = Shop.where(area: params[:search])
+    @tabelogPlaces = Place.where(service: "食べログ")
     @placeinfo = @places.find_by(service: "食べログ")
     @tabelogshops = Shop.where(area: params[:search]).where(service: "食べログ")
     @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")

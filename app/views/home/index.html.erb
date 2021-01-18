@@ -8,26 +8,27 @@
         <%= submit_tag 'Search', :name => nil %>
       <% end %>
     </div>
-  </div>
-  <div class="footer_links">
-    <h3>食べログ</h3>
-    <ul>
-    <%
-      if @tabelogPlaces
-        @tabelogPlaces.each do |place|
-    %>
-        <li style=""><%= link_to "#{place.area}", "place/#{place.area}/ranking" %></li>
-    <%
+    <div class="footer_links">
+      <h3>食べログ</h3>
+      <ul>
+      <%
+        if @tabelogPlaces
+          @tabelogPlaces.each do |place|
+      %>
+          <li style=""><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
+      <%
+          end
         end
-      end
-    %>
-    </ul>
+      %>
+      </ul>
+    </div>
   </div>
+
 
   <div id="ranking">
       <div class="rankings tabelog_rankings">
         <div class="ranking_results" style="padding-top:50px;">
-          <h3 style="padding:10px 0px;">過去の閲覧履歴</h3>
+          <h3 style="padding:10px 0px; text-align:center;">過去の閲覧履歴</h3>
 
           <!-- 食べログランキングコンテンツ -->
           <div class="row">
@@ -94,13 +95,14 @@
   var cookieShopName;
   var tabelogshopdata = [];
 
-  // var cookies = document.cookie; // 全てのcookieを取り出して
-  // var cookiesArray = cookies.split(';'); // ;で分割し配列に
-
-  cookieShopNames = Cookies.get('shopnames').replace("[", "").replace("]", "").split('","')
+  // Coolieからshopnamesキーの値を取り出す
+  cookieShopNames = Cookies.get('shopnames');
 
   // 無害化した店舗名を配列に格納し直す
-  if(cookieShopNames!=""){
+  if(cookieShopNames==null){
+    cookieShopNames = [];
+  }else{
+    cookieShopNames = cookieShopNames.replace("[", "").replace("]", "").split('","')
     var a = 0;
     var replaceShopNames = cookieShopNames
     cookieShopNames = [];
@@ -129,7 +131,6 @@
         tabelogshopdata.push(shopdata)
       }
     }
-
   }
 
   console.log(tabelogshopdata);
@@ -150,7 +151,7 @@
       for (var i = 0; i < tabelogshopdata.length; i++) {
         addMarker(i);
       }
-      marker[0].setOptions({
+        marker[0].setOptions({
       });
    }
 
@@ -191,14 +192,7 @@
      }
    }
 
-   // Cookie書き込み
-   function writeCookie(i) {
-     cookieShopName = tabelogshopdata[i]['name']
-     cookieShopNames.push(cookieShopName)
-     var json_str = JSON.stringify(cookieShopNames);
-     date.setMinutes(date.getDate() + 7);  // 1週間後までセッションを保存
-     document.cookie = "shopnames=" + json_str + "; expires=" + date.toUTCString() + "; path=/";
-   }
+
 
 
    // 画像の遅延読み込み
@@ -226,7 +220,6 @@
          closewindow();  //他の吹き出しを消す
          i = i - 1
          infoWindow[i].open(tabelogmap, marker[i]);
-         writeCookie(i);  // Cookieに書き込む
        },
        // 定休日をグレーアウト
        sortShop: function(){

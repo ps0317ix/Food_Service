@@ -1,7 +1,7 @@
 <div class="main top-main">
   <div class="container">
     <div class="top-message">
-      <h2>検索</h2>
+      <h2>エリア検索</h2>
       <%= form_tag("/search_exe",:method => 'get') do %>
         <%= text_field_tag :search %>
         <%= submit_tag 'Search', :name => nil %>
@@ -24,7 +24,6 @@
                 <div class="sort_btns">
                   <button class="btn" @click="reverseSortShop()">元に戻す</button>
                   <button class="btn" @click="sortShop()">開店中のみ表示</button>
-
                 </div>
               </div>
               <div class="col-md-6">
@@ -101,10 +100,11 @@
 
   var date = new Date();          // Dateオブジェクトを作成
   var dayOfWeek = date.getDay();  // 曜日を格納
-  var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
+  var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek]; // 曜日を日本語置換
 
-  var arealat = <%= @placeinfo.latitude %>
-  var arealng = <%= @placeinfo.longitude %>
+  var arealat = <%= @placeinfo.latitude %>  //map用の緯度
+  var arealng = <%= @placeinfo.longitude %>  //map用の経度
+  var a = 0;
 
   // 食べログの店舗情報
   var tabelogshopdata = [
@@ -131,24 +131,45 @@
     end %>
   ];
 
+  var cookieShopNames = [];  // cookieからクリックした店舗の配列を取得
+  var cookieShopName;
 
-   var marker = [];
-   var infoWindow = [];
+
+  cookieShopNames = Cookies.get('shopnames');
+  console.log(cookieShopNames);
+
+  // 無害化した店舗名を配列に格納し直す
+  if(cookieShopNames==null){
+    cookieShopNames = [];
+  }else{
+    cookieShopNames = cookieShopNames.replace("[", "").replace("]", "").split('","');
+    var a = 0;
+    var replaceShopNames = cookieShopNames
+    cookieShopNames = [];
+    for(var cookieShop of replaceShopNames){
+      cookieShop = cookieShop.replace(/\"/g, "").replace(/\\/g, "") // サニタイジング
+      cookieShopNames.unshift(cookieShop);
+    }
+  }
+
+
+
+   var marker = [];      // マーカーの配列
+   var infoWindow = [];  // ウインドウの設定
+   var z = 0;
 
    function initMap() {
       // 地図の作成
-      // var mapLatLng = new google.maps.LatLng({lat: tabelogshopdata[0]['lat'], lng: tabelogshopdata[0]['lng']}); // 緯度経度のデータ作成
       var mapLatLng = new google.maps.LatLng({lat: arealat, lng: arealng});
       tabelogmap = new google.maps.Map(document.getElementById('tabelog_map_canvas'), { // #sampleに地図を埋め込む
         center: mapLatLng, // 地図の中心を指定
-         zoom: 15 // 地図のズームを指定
+         zoom: 16 // 地図のズームを指定
       });
       // マーカー毎の処理
       for (var i = 0; i < tabelogshopdata.length; i++) {
         addMarker(i);
       }
       marker[0].setOptions({
-
       });
    }
 
@@ -157,8 +178,8 @@
        markerLatLng = new google.maps.LatLng({lat: tabelogshopdata[i]['lat'], lng: tabelogshopdata[i]['lng']}); // 緯度経度のデータ作成
        marker[i] = new google.maps.Marker({ // マーカーの追加
          position: markerLatLng, // マーカーを立てる位置を指定
-         map: tabelogmap, // マーカーを立てる地図を指定
-         animation: google.maps.Animation.DROP,
+         map: tabelogmap,     // マーカーを立てる地図を指定
+         animation: google.maps.Animation.DROP,  //マーカーを立てるアニメーションを設定
          label:{
            text: (i+1).toString(),
            color: '#FFFFFF',
@@ -168,6 +189,7 @@
           fillOpacity: 0.8,
          }
       });
+      console.log(marker[i]);
       infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           content: '<div class="map_window" style="z-index:"' + i + '";"><a href="' + tabelogshopdata[i]['href'] + '" style="text-decoration: none;"><h5>' + (i+1) + '位 ' + tabelogshopdata[i]['name'] + '</h5><p>' + tabelogshopdata[i]['address'] + '<br>' + tabelogshopdata[i]['jenre'] + '<br>定休日：' + tabelogshopdata[i]['week'] + '<br>営業時間：' + tabelogshopdata[i]['time'] + '</p><img src="' + tabelogshopdata[i]['img'] + '"></a></div>' // 吹き出しに表示する内容
         });
@@ -189,10 +211,30 @@
      }
    }
 
+   // Cookie書き込み
+   function writeCookie(i){
+     var cnt = 0
+     cookieShopName = tabelogshopdata[i]['name']
+     for(var compareShopName of cookieShopNames){
+       if(cookieShopName == compareShopName){
+         console.log('cookie書き込みスキップ');
+         exit;
+       }
+     }
 
+     cookieShopNames.unshift(cookieShopName)
+     var json_str = JSON.stringify(cookieShopNames);
+     console.log(json_str);
+     // document.cookie = "shopnames=" + encodeURIComponent(json_str) + " expires=" + date.toUTCString() + "; path=/;"
+     Cookies.set('shopnames', json_str, { expires: 7, path: "/"});
+   }
+
+
+   // 画像の遅延読み込み
    const VLazyImagePlugin = window['VLazyImage'].VLazyImagePlugin;
    Vue.use(VLazyImagePlugin);
 
+   //ページネーションを定義
    Vue.component('paginate', VuejsPaginate)
 
    var vm = new Vue({
@@ -208,11 +250,14 @@
        clickCallback: function (pageNum) {
           this.currentPage = Number(pageNum);
        },
+       // クリックした時吹き出しを追加
        windowOpen: function(i){
-         closewindow();
+         closewindow();  //他の吹き出しを消す
          i = i - 1
          infoWindow[i].open(tabelogmap, marker[i]);
+         writeCookie(i);  // Cookieに書き込む
        },
+       // 定休日をグレーアウト
        sortShop: function(){
          for(var x=0; x<this.tabelogitems.length; x++){
            if(~this.tabelogitems[x]['week'].indexOf(dayOfWeekStr+'曜')){
@@ -221,6 +266,7 @@
            }
          }
        },
+       // グレーアウトを元に戻す
        reverseSortShop: function(){
          for(var y=0; y<this.tabelogitems.length; y++){
            if(~this.tabelogitems[y]['week'].indexOf(dayOfWeekStr+'曜')){
@@ -231,6 +277,7 @@
        }
       },
       computed: {
+        // ページネーション関連
         getTabelogItems: function() {
          let tabelogCurrent = this.currentPage * this.parPage;
          let tabelogStart = tabelogCurrent - this.parPage;
@@ -256,5 +303,5 @@
          return Math.ceil(this.rettyitems.length / this.parPage);
        },
       }
-    })
+    });
 </script>
