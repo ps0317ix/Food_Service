@@ -229,7 +229,7 @@
 
   #tabelog_map_canvas{
     width: 100%;
-    height: 850px;
+    height: 550px;
   }
 
   .map_window{
@@ -255,10 +255,14 @@
     padding: 10px 0px;
   }
 
+  .sort_btns button{
+    margin: 5px;
+  }
+
 
   .ranking_result{
     width: 100%;
-    height: 200px;
+    height: 180px;
     border: 1px solid rgb(255, 179, 0);
     background: #fff;
   }
@@ -269,13 +273,14 @@
 
   .ranking_result_img img{
     width: 100%;
-    height: 198px;
+    height: 178px;
     object-fit: cover;
   }
 
   .ranking_result_content{
     text-align: left;
-    height: 200px;
+    height: 179px;
+    overflow: hidden;
   }
 
 

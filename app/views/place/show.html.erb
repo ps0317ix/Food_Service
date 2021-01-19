@@ -15,6 +15,12 @@
                   <button class="btn" @click="reverseSortShop()">元に戻す</button>
                   <button class="btn" @click="sortShop()">開店中のみ表示</button>
                 </div>
+                <div class="sort_btns">
+                  <h4>ジャンル</h4>
+                  <template v-for="jenre in tabelogshopjenre">
+                    <button class="btn" @click="sortJenre(jenre)">{{ jenre }}</button>
+                  </template>
+                </div>
               </div>
               <div class="col-md-6">
                 <ul>
@@ -25,7 +31,7 @@
                             <v-lazy-image :src="item.img" :src-placeholder="item.img" ></v-lazy-image>
                           </div>
                           <div class="ranking_result_content col-md-8">
-                            <h2>{{ item.no }}位 {{ item.name }}</h2>
+                            <h2 style="font-size:26px;">{{ item.no }}位 {{ item.name }}</h2>
                             <p class="address">{{ item.address }}</p>
                             <p style="font-size:11px;">{{ item.jenre }}<br>
                             定休日：{{ item.week }}<br>営業時間：{{ item.time }}</p>
@@ -127,8 +133,8 @@
     var dayOfWeek = date.getDay();  // 曜日を格納
     var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek]; // 曜日を日本語置換
 
-    var arealat = <%= @placeinfo.latitude %>  //map用の緯度
-    var arealng = <%= @placeinfo.longitude %>  //map用の経度
+    var arealat = <%= @placeinfo.latitude %>  //map用の中心緯度
+    var arealng = <%= @placeinfo.longitude %>  //map用の中心経度
     var a = 0;
 
     // 食べログの店舗情報
@@ -139,6 +145,30 @@
       <% @cnt += 1
       end %>
     ];
+    // 「、」を除去したジャンルの配列
+    var tabelogshopjenres = [
+      <% @cnt = 1
+      @tabelogshops.each do |shop|
+        if shop.jenre != nil
+          @shop = shop.jenre
+          if @shop.match('、')
+            @shops = @shop.split('、')
+            @shops.each do |separateshop| %>
+            "<%= separateshop %>",
+         <% end
+          else
+          %>
+          "<%= @shop %>",
+      <%  end
+        end
+        @cnt += 1
+      end %>
+    ];
+    // 重複を消す
+    var tabelogshopjenre = tabelogshopjenres.filter(function (x, i, self) {
+            return self.indexOf(x) === i;
+    });
+
     // 一休の店舗情報
     var ikkyushopdata = [
       <% @cnt = 1
@@ -156,12 +186,15 @@
       end %>
     ];
 
+
     var cookieShopNames = [];  // cookieからクリックした店舗の配列を取得
     var cookieShopName;
 
 
     cookieShopNames = Cookies.get('shopnames');
     console.log(cookieShopNames);
+
+
 
     // 無害化した店舗名を配列に格納し直す
     if(cookieShopNames==null){
@@ -214,7 +247,6 @@
             fillOpacity: 0.8,
            }
         });
-        console.log(marker[i]);
         infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
             content: '<div class="map_window" style="z-index:"' + i + '";"><a href="' + tabelogshopdata[i]['href'] + '" style="text-decoration: none;"><h5>' + (i+1) + '位 ' + tabelogshopdata[i]['name'] + '</h5><p>' + tabelogshopdata[i]['address'] + '<br>' + tabelogshopdata[i]['jenre'] + '<br>定休日：' + tabelogshopdata[i]['week'] + '<br>営業時間：' + tabelogshopdata[i]['time'] + '</p><img src="' + tabelogshopdata[i]['img'] + '"></a></div>' // 吹き出しに表示する内容
           });
@@ -249,7 +281,6 @@
 
        cookieShopNames.unshift(cookieShopName)
        var json_str = JSON.stringify(cookieShopNames);
-       console.log(json_str);
        // document.cookie = "shopnames=" + encodeURIComponent(json_str) + " expires=" + date.toUTCString() + "; path=/;"
        Cookies.set('shopnames', json_str, { expires: 7, path: "/"});
      }
@@ -268,6 +299,7 @@
           parPage: 4,
           currentPage: 1,
           tabelogitems: tabelogshopdata,
+          tabelogJenre: tabelogshopjenre,
           ikkyuitems: ikkyushopdata,
           rettyitems: rettyshopdata,
         },
@@ -291,6 +323,19 @@
              }
            }
          },
+         // ジャンルに当てはまらない店舗情報をグレーアウト
+         sortJenre: function(jenre){
+           // reverseSortShop();
+           for(var o=0; o<this.tabelogitems.length; o++){
+             if(~this.tabelogitems[o]['jenre'].indexOf(jenre)){
+               this.tabelogitems[o]['opacity'] = 1
+               addMarker(o);
+             }else{
+               this.tabelogitems[o]['opacity'] = 0.2
+               marker[o].setMap(null);
+             }
+           }
+         },
          // グレーアウトを元に戻す
          reverseSortShop: function(){
            for(var y=0; y<this.tabelogitems.length; y++){
@@ -302,11 +347,16 @@
          }
         },
         computed: {
-          // ページネーション関連
+        // ページネーション関連
+          // 食べログの店舗情報をページネーションのカウント分だけにする
           getTabelogItems: function() {
            let tabelogCurrent = this.currentPage * this.parPage;
            let tabelogStart = tabelogCurrent - this.parPage;
            return this.tabelogitems.slice(tabelogStart, tabelogCurrent);
+          },
+          // ジャンルの配列
+          tabelogshopjenre: function(){
+            return tabelogshopjenre
           },
           getIkkyuItems: function() {
            let current = this.currentPage * this.parPage;

@@ -40,6 +40,11 @@
                 <button class="btn" @click="reverseSortShop()">元に戻す</button>
                 <button class="btn" @click="sortShop()">開店中のみ表示</button>
               </div>
+              <div class="sort_btns">
+                <template v-for="jenre in tabelogshopjenre">
+                  <button class="btn" @click="sortJenre(jenre)">{{ jenre }}</button>
+                </template>
+              </div>
             </div>
             <div class="col-md-6">
               <ul>
@@ -50,7 +55,7 @@
                           <v-lazy-image :src="item.img" :src-placeholder="item.img" ></v-lazy-image>
                         </div>
                         <div class="ranking_result_content col-md-8">
-                          <h2>{{ item.name }}</h2>
+                          <h2 style="font-size:26px;">{{ item.name }}</h2>
                           <p class="address">{{ item.address }}</p>
                           <p style="font-size:11px;">{{ item.jenre }}<br>
                           定休日：{{ item.week }}<br>営業時間：{{ item.time }}</p>
@@ -120,6 +125,26 @@
     @tabelogshops.each do |shop| %>
         {no: <%= @cnt %>, id: "<%= shop.id %>", area: "<%= shop.area %>", name: "<%= shop.name %>", href: "<%= shop.url %>", img: "<%= shop.img %>", address:"<%= shop.address %>", lat:<%= shop.latitude %>, lng:<%= shop.longitude %>, jenre: "<%= shop.jenre %>", week: "<%= shop.week %>", time: "<%= shop.time %>", opacity: 1},
     <% @cnt += 1
+    end %>
+  ];
+
+  // 「、」を除去したジャンルの配列
+  var tabelogshopjenre = [
+    <% @cnt = 1
+    @tabelogshops.each do |shop|
+      if shop.jenre != nil
+        @shop = shop.jenre
+        if @shop.match('、')
+          @shops = @shop.split('、')
+          @shops.each do |separateshop| %>
+          "<%= separateshop %>",
+       <% end
+        else
+        %>
+        "<%= @shop %>",
+    <%  end
+      end
+      @cnt += 1
     end %>
   ];
 
@@ -241,18 +266,23 @@
        }
      },
       computed: {
-        // ページネーション関連
+      // ページネーション関連
+        // 食べログの店舗情報をページネーションのカウント分だけにする
         getTabelogItems: function() {
          let tabelogCurrent = this.currentPage * this.parPage;
          let tabelogStart = tabelogCurrent - this.parPage;
          return this.tabelogitems.slice(tabelogStart, tabelogCurrent);
+        },
+        // ジャンルの配列
+        tabelogshopjenre: function(){
+          return tabelogshopjenre
         },
         getIkkyuItems: function() {
          let current = this.currentPage * this.parPage;
          let start = current - this.parPage;
          return this.ikkyuitems.slice(start, current);
        },
-         getRettyItems: function() {
+        getRettyItems: function() {
           let current = this.currentPage * this.parPage;
           let start = current - this.parPage;
           return this.rettyitems.slice(start, current);
