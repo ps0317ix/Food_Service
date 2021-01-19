@@ -33,11 +33,13 @@
           </div>
         </li>
         <li>
+        <!-- 検索フォーム -->
           <%= form_tag("/search_exe",:method => 'get') do %>
             <%= text_field_tag :search %>
             <%= submit_tag 'Search', :name => nil %>
           <% end %>
         </li>
+        <!-- ユーザー認証をした場合 -->
         <% if @current_user %>
           <li>
             <%= link_to(@current_user.name, "/users/#{@current_user.id}") %>
@@ -71,18 +73,21 @@
         <div class="footer_links">
           <h3>食べログ</h3>
           <ul>
-          <%
-            if @tabelogPlaces
+          <% if @tabelogPlaces
+            @x = 1
               @tabelogPlaces.each do |place|
-          %>
-              <li style=""><%= link_to "#{place.area}", "place/#{place.area}/ranking" %></li>
-          <%
+                if @x % 11 == 0 %>
+                  <ul>
+                <% end %>
+              <li><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
+                <% if @x % 10 == 0 %>
+                  </ul>
+                <% end %>
+            <% @x += 1
               end
-            end
-          %>
-          </ul>
-
-      </div>
+            end %>
+          <ul>
+        </div>
     </footer>
   </body>
   <script src="https://maps.googleapis.com/maps/api/js?language=ja&region=JP&key=AIzaSyCpM_NXjd2FB5C8spyddfKd9rDDVndEIkA&callback=initMap" async defer></script>

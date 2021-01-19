@@ -147,22 +147,9 @@
     ];
     // 「、」を除去したジャンルの配列
     var tabelogshopjenres = [
-      <% @cnt = 1
-      @tabelogshops.each do |shop|
-        if shop.jenre != nil
-          @shop = shop.jenre
-          if @shop.match('、')
-            @shops = @shop.split('、')
-            @shops.each do |separateshop| %>
-            "<%= separateshop %>",
-         <% end
-          else
-          %>
-          "<%= @shop %>",
-      <%  end
-        end
-        @cnt += 1
-      end %>
+        <% @tabelogshopjenre.each do |shopjenre|  %>
+          "<%= shopjenre %>",
+        <% end %>
     ];
     // 重複を消す
     var tabelogshopjenre = tabelogshopjenres.filter(function (x, i, self) {
@@ -339,10 +326,8 @@
          // グレーアウトを元に戻す
          reverseSortShop: function(){
            for(var y=0; y<this.tabelogitems.length; y++){
-             if(~this.tabelogitems[y]['week'].indexOf(dayOfWeekStr+'曜')){
                this.tabelogitems[y]['opacity'] = 1
                addMarker(y);
-             }
            }
          }
         },

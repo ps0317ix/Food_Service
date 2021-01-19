@@ -4,6 +4,7 @@ require "nokogiri"
 
 class PlaceController < ApplicationController
 
+  # エリアのTOP
   def index
     if params[:search]
       @places = Place.search(params[:search])
@@ -17,9 +18,8 @@ class PlaceController < ApplicationController
     @place = Place.new
   end
 
-
+  # 店舗情報新規追加
   def create
-
     @address = Geocoder.search(params[:area])
     link = params[:url]
 
@@ -29,7 +29,6 @@ class PlaceController < ApplicationController
       service: params[:service],
       address: @address
     )
-
 
     if params[:service] == "食べログ"
       Place.tabelogScraping(params[:area], params[:service], link)
@@ -48,35 +47,39 @@ class PlaceController < ApplicationController
     end
   end
 
-
+  # エリア情報編集ページ
   def edit
     @allPlaces = Place.all
+    @tabelogPlaces = Place.where(service: "食べログ")
   end
 
+  # 店舗情報編集ページ
   def edit_shop
     @allPlaces = Place.all
     @allShops = Shop.where(area: params[:area])
     @allShopsAddress = Shop.where(area: params[:area]).where.not(address: nil)
   end
 
-
+  # エリア情報削除ページ
   def delete
     @place = Place.find_by(id: params[:id])
     @shops = Shop.where(area: @place.area).where(service: @place.service)
     @place.destroy
     if @shops.destroy_all
-      flash[:notice] = "地域削除が完了しました"
+      flash[:notice] = "エリア情報削除が完了しました"
       redirect_to("/place/edit")
     else
-      flash[:notice] = "地域削除が失敗しました"
+      flash[:notice] = "エリア情報削除が失敗しました"
       render("/place/edit")
     end
   end
 
 
+  # エリア情報更新
   def update
     @place = Place.find_by(id: params[:id])
     @shops = Shop.where(area: @place.area).where(service: @place.service)
+    @tabelogPlaces = Place.where(service: "食べログ")
 
     link = @place.url
 
@@ -96,21 +99,38 @@ class PlaceController < ApplicationController
   end
 
 
+  # エリア情報詳細ページ
   def show
     @places = Place.where(area: params[:area])
     @placeinfo = @places.find_by(service: "食べログ")
+    @tabelogPlaces = Place.where(service: "食べログ")
     @Shops = Shop.where(area: params[:area])
     @tabelogshops = Shop.where(area: params[:area]).where(service: "食べログ")
     @ikkyushops = Shop.where(area: params[:area]).where(service: "一休")
     @rettyshops = Shop.where(area: params[:area]).where(service: "Retty")
-    # @clickcnt = Clickcnt.find_by()
+    @tabelogshopjenre = []
+    @tabelogshops.each do |shop|
+      if shop.jenre != nil
+        @shop = shop.jenre
+        if @shop.match('、')
+          @shopjenres = @shop.split('、')
+          @shopjenres.each do |shopjenre|
+            @tabelogshopjenre.push(shopjenre)
+          end
+        else
+          @tabelogshopjenre.push(@shop)
+        end
+      end
+    end
   end
 
-  def clickcntdb
-    @clickcntdb = Place.clickcnt(params[:area], service, shopname)
-  end
+  # クリック数カウント関連
+  # def clickcntdb
+  #   @clickcntdb = Place.clickcnt(params[:area], service, shopname)
+  # end
 
 
+  # 検索ページ
   def search
     @allPlaces = Place.all
     @tabelogs = Place.where(service: "食べログ")
@@ -123,12 +143,28 @@ class PlaceController < ApplicationController
       @tabelogshops = Shop.where(area: params[:search]).where(service: "食べログ")
       @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
       @rettyshops = Shop.where(area: params[:search]).where(service: "Retty")
+
+      @tabelogshopjenre = []
+      @tabelogshops.each do |shop|
+        if shop.jenre != nil
+          @shop = shop.jenre
+          if @shop.match('、')
+            @shopjenres = @shop.split('、')
+            @shopjenres.each do |shopjenre|
+              @tabelogshopjenre.push(shopjenre)
+            end
+          else
+            @tabelogshopjenre.push(@shop)
+          end
+        end
+      end
     else
       @places = Place.all
       # @Shops = Shop.all
     end
   end
 
+  # 検索実行ページ
   def search_exe
     @places = Place.search(params[:search])
     @Shops = Shop.where(area: params[:search])
@@ -137,6 +173,21 @@ class PlaceController < ApplicationController
     @tabelogshops = Shop.where(area: params[:search]).where(service: "食べログ")
     @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
     @rettyshops = Shop.where(area: params[:search]).where(service: "Retty")
+
+    @tabelogshopjenre = []
+    @tabelogshops.each do |shop|
+      if shop.jenre != nil
+        @shop = shop.jenre
+        if @shop.match('、')
+          @shopjenres = @shop.split('、')
+          @shopjenres.each do |shopjenre|
+            @tabelogshopjenre.push(shopjenre)
+          end
+        else
+          @tabelogshopjenre.push(@shop)
+        end
+      end
+    end
   end
 
 

@@ -25,12 +25,12 @@ class Place < ApplicationRecord
       page.read
     end
     @Doc = Nokogiri::HTML(open(link))
-    @tabelogContents = @Doc.xpath("//div[@class='list-rst__wrap js-open-new-window']")
+    @tabelogContents = @Doc.xpath("//div[@class='list-rst__wrap js-open-new-window']") # 各店舗詳細を取得
     @tabelogContents.each do |content|
       @tabelogTitle = content.xpath(".//a[@class='list-rst__rst-name-target cpy-rst-name js-ranking-num']")
       @tabeloghref = @tabelogTitle.attribute("href")
       charset = nil
-      # 各店舗の詳細ページをスクレイピング
+      # 各店舗の詳細ページへ遷移し、スクレイピング
       html = open(@tabeloghref) do |page|
         charset = page.charset
         page.read

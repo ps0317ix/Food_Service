@@ -4,21 +4,22 @@ class UsersController < ApplicationController
   before_action :forbid_login_user, {only: [:new, :create, :login_form, :login]}
   before_action :ensure_correct_user, {only: [:edit, :update]}
 
+  # ユーザーホーム
   def index
     @users = User.all.order(created_at: :desc)
   end
 
-
+  # ユーザー一覧
   def show
     @users = User.find_by(id: params[:id])
   end
 
-
+  # ユーザー新規登録ページ
   def new
     @user = User.new
   end
 
-
+  # ユーザー新規作成実行
   def create
     @user = User.new(
       name: params[:name],
@@ -34,12 +35,12 @@ class UsersController < ApplicationController
     end
   end
 
-
+  # ユーザー情報更新ページ
   def edit
     @user = User.find_by(id: params[:id])
   end
 
-
+  # ユーザー情報更新実行
   def update
     @user = User.find_by(id: params[:id])
     @user.name = params[:name]
@@ -59,7 +60,7 @@ class UsersController < ApplicationController
     end
   end
 
-
+  # ログイン
   def login
     @user = User.find_by(email: params[:email])
     if @user && @user.authenticate(params[:password])
@@ -74,14 +75,14 @@ class UsersController < ApplicationController
     end
   end
 
-
+  # ログアウト
   def logout
     session[:user_id] = nil
     flash[:notice] = "ログアウトしました"
     redirect_to("/login")
   end
 
-
+  # 権限判定
   def ensure_correct_user
     if @current_user.id != params[:id].to_i
       flash[:notice] = "権限がありません"

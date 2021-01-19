@@ -11,16 +11,19 @@
     <div class="footer_links">
       <h3>食べログ</h3>
       <ul>
-      <%
-        if @tabelogPlaces
+      <% @x = 1
           @tabelogPlaces.each do |place|
-      %>
-          <li style=""><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
-      <%
-          end
-        end
-      %>
-      </ul>
+            if @x % 11 == 0 %>
+            <!-- 10カラムで改行 -->
+              <ul>
+            <% end %>
+          <li><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
+            <% if @x % 10 == 0 %>
+              </ul>
+            <% end %>
+        <% @x += 1
+          end %>
+      <ul>
     </div>
   </div>
 
@@ -41,6 +44,7 @@
                 <button class="btn" @click="sortShop()">開店中のみ表示</button>
               </div>
               <div class="sort_btns">
+                <h4>ジャンル</h4>
                 <template v-for="jenre in tabelogshopjenre">
                   <button class="btn" @click="sortJenre(jenre)">{{ jenre }}</button>
                 </template>
@@ -129,7 +133,7 @@
   ];
 
   // 「、」を除去したジャンルの配列
-  var tabelogshopjenre = [
+  var tabelogshopjenres = [
     <% @cnt = 1
     @tabelogshops.each do |shop|
       if shop.jenre != nil
@@ -147,13 +151,17 @@
       @cnt += 1
     end %>
   ];
+  // 重複を消す
+  var tabelogshopjenre = tabelogshopjenres.filter(function (x, i, self) {
+          return self.indexOf(x) === i;
+  });
 
 
   //過去履歴とマッチするか比較
   for(var shopdata of alltabelogshopdata){
     for(var b=0; b<cookieShopNames.length; b++){
       if(cookieShopNames[b] == shopdata['name']){
-        tabelogshopdata.push(shopdata)
+        tabelogshopdata.unshift(shopdata)
       }
     }
   }
@@ -255,13 +263,24 @@
            }
          }
        },
+       // ジャンルに当てはまらない店舗情報をグレーアウト
+       sortJenre: function(jenre){
+         // reverseSortShop();
+         for(var o=0; o<this.tabelogitems.length; o++){
+           if(~this.tabelogitems[o]['jenre'].indexOf(jenre)){
+             this.tabelogitems[o]['opacity'] = 1
+             addMarker(o);
+           }else{
+             this.tabelogitems[o]['opacity'] = 0.2
+             marker[o].setMap(null);
+           }
+         }
+       },
        // グレーアウトを元に戻す
        reverseSortShop: function(){
          for(var y=0; y<this.tabelogitems.length; y++){
-           if(~this.tabelogitems[y]['week'].indexOf(dayOfWeekStr+'曜')){
              this.tabelogitems[y]['opacity'] = 1
              addMarker(y);
-           }
          }
        }
      },
