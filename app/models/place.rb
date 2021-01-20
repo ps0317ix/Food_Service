@@ -39,12 +39,12 @@ class Place < ApplicationRecord
       @tabelogAddress = @tabelogDoc.xpath('.//p[@class="rstinfo-table__address"]').text
       @tabelogImg = @tabelogDoc.css("img.p-main-photos__slider-image").attribute("src")
       @tabelogCloseDate = @tabelogDoc.xpath('.//dd[@id="short-comment"]').text.gsub(' ', '').gsub(/[\r\n]/,"")
-      @tabelogShopTime = @tabelogDoc.xpath('.//*[@id="rst-data-head"]/table[1]/tbody/tr[8]/td/p[2]').text.gsub('&lt;', '<').gsub('&gt;', '>')
+      @tabelogShopTime = @tabelogDoc.xpath('.//*[@id="rst-data-head"]/table[1]/tbody/tr[8]/td/p[2]').inner_text.gsub('/[\&lt;]/', '').gsub('/[\&gt;]/', '')
       if not @tabelogImg
         @tabelogImg = @tabelogDoc.css("a.js-imagebox-trigger img").attribute('src')
       end
       @tabelogJenre = @tabelogDoc.at_css('#rst-data-head > table:nth-child(2) > tbody > tr:nth-child(3) > td > span > text()')
-      @Shops = Shop.new(name: @tabelogTitle.inner_text, url: @tabeloghref, area: area, service: service, img: @tabelogImg, jenre: @tabelogJenre, address: @tabelogAddress, week:@tabelogCloseDate ,time:@tabelogShopTime)
+      @Shops = Shop.new(name: @tabelogTitle.inner_text.gsub(/[\&amp;]/, ''), url: @tabeloghref, area: area, service: service, img: @tabelogImg, jenre: @tabelogJenre, address: @tabelogAddress, week:@tabelogCloseDate ,time:@tabelogShopTime)
       @Shops.save
       @clickcnt = Clickcnt.new(
         click: 0,
@@ -141,5 +141,6 @@ class Place < ApplicationRecord
       @click = @clickcnt.click + 1
       @clickcnt.update(click: @click)
   end
+
 
 end

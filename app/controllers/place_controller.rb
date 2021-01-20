@@ -11,6 +11,14 @@ class PlaceController < ApplicationController
     else
       @places = Place.all
     end
+    @placeinfo = @places.find_by(service: "食べログ")
+    @tabelogPlaces = Place.where(service: "食べログ")
+    @Shops = Shop.all
+    @tabelogshops = Shop.where(service: "食べログ")
+    @ikkyushops = Shop.where(service: "一休")
+    @rettyshops = Shop.where(service: "Retty")
+    # ジャンルの配列
+    @tabelogshopjenre = Shop.shopjenre(@tabelogshops)
   end
 
   # 新規登録
@@ -108,20 +116,8 @@ class PlaceController < ApplicationController
     @tabelogshops = Shop.where(area: params[:area]).where(service: "食べログ")
     @ikkyushops = Shop.where(area: params[:area]).where(service: "一休")
     @rettyshops = Shop.where(area: params[:area]).where(service: "Retty")
-    @tabelogshopjenre = []
-    @tabelogshops.each do |shop|
-      if shop.jenre != nil
-        @shop = shop.jenre
-        if @shop.match('、')
-          @shopjenres = @shop.split('、')
-          @shopjenres.each do |shopjenre|
-            @tabelogshopjenre.push(shopjenre)
-          end
-        else
-          @tabelogshopjenre.push(@shop)
-        end
-      end
-    end
+    # ジャンルの配列
+    @tabelogshopjenre = Shop.shopjenre(@tabelogshops)
   end
 
   # クリック数カウント関連
@@ -143,21 +139,9 @@ class PlaceController < ApplicationController
       @tabelogshops = Shop.where(area: params[:search]).where(service: "食べログ")
       @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
       @rettyshops = Shop.where(area: params[:search]).where(service: "Retty")
+      # ジャンルの配列
+      @tabelogshopjenre = Shop.shopjenre(@tabelogshops)
 
-      @tabelogshopjenre = []
-      @tabelogshops.each do |shop|
-        if shop.jenre != nil
-          @shop = shop.jenre
-          if @shop.match('、')
-            @shopjenres = @shop.split('、')
-            @shopjenres.each do |shopjenre|
-              @tabelogshopjenre.push(shopjenre)
-            end
-          else
-            @tabelogshopjenre.push(@shop)
-          end
-        end
-      end
     else
       @places = Place.all
       # @Shops = Shop.all
@@ -173,21 +157,8 @@ class PlaceController < ApplicationController
     @tabelogshops = Shop.where(area: params[:search]).where(service: "食べログ")
     @ikkyushops = Shop.where(area: params[:search]).where(service: "一休")
     @rettyshops = Shop.where(area: params[:search]).where(service: "Retty")
-
-    @tabelogshopjenre = []
-    @tabelogshops.each do |shop|
-      if shop.jenre != nil
-        @shop = shop.jenre
-        if @shop.match('、')
-          @shopjenres = @shop.split('、')
-          @shopjenres.each do |shopjenre|
-            @tabelogshopjenre.push(shopjenre)
-          end
-        else
-          @tabelogshopjenre.push(@shop)
-        end
-      end
-    end
+    # ジャンルの配列
+    @tabelogshopjenre = Shop.shopjenre(@tabelogshops)
   end
 
 

@@ -298,7 +298,12 @@
     position: relative;
     bottom: 0;
     width: 100%;
+    padding: 50px 0px;
     background: linear-gradient(0deg, rgba(255, 145, 8,0.7917542016806722) 0%, rgba(255, 145, 8,0.6) 100%);
+  }
+
+  .footer_links h3{
+    text-align: center;
   }
 
 
