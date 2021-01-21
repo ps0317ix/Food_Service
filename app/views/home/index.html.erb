@@ -10,20 +10,38 @@
     </div>
     <div class="footer_links">
       <h3>食べログ</h3>
-      <ul>
-      <% @x = 1
-          @tabelogPlaces.each do |place|
-            if @x % 11 == 0 %>
-            <!-- 10カラムで改行 -->
-              <ul>
-            <% end %>
-          <li><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
-            <% if @x % 10 == 0 %>
-              </ul>
-            <% end %>
-        <% @x += 1
-          end %>
-      <ul>
+      <div class="pc">
+        <ul>
+        <% @x = 1
+            @tabelogPlaces.each do |place|
+              if @x % 11 == 0 %>
+              <!-- 10カラムで改行 -->
+                <ul>
+              <% end %>
+            <li><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
+              <% if @x % 10 == 0 %>
+                </ul>
+              <% end %>
+          <% @x += 1
+            end %>
+        </ul>
+      </div>
+      <div class="sp">
+        <% @x = 0
+            @tabelogPlaces.each do |place|
+              if @x % 4 == 0 %>
+              <!-- 10カラムで改行 -->
+                <ul>
+              <% end
+              @x += 1 %>
+            <li><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
+              <% if @x % 4 == 0 && @x > 0%>
+                </ul>
+              <% end %>
+          <%
+            end %>
+      </div>
+
     </div>
   </div>
 
