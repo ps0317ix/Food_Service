@@ -72,11 +72,11 @@
               <ul>
                 <template v-for="(item, index) in getTabelogItems">
                   <a class="item_link" @click="windowOpen(getIndex(index)-1)">
-                    <li class="ranking_result row" v-bind:style="{opacity:item.opacity}">
-                        <div class="ranking_result_img col-md-4" style="padding:0px;">
+                    <li class="ranking_result" v-bind:style="{opacity:item.opacity}">
+                        <div class="ranking_result_img" style="padding:0px;">
                           <v-lazy-image :src="item.img" :src-placeholder="item.img" ></v-lazy-image>
                         </div>
-                        <div class="ranking_result_content col-md-8">
+                        <div class="ranking_result_content">
                           <h2 style="font-size:26px;">{{ getIndex(index) }} {{ item.name }}</h2>
                           <p class="address">{{ item.address }}</p>
                           <p style="font-size:11px;">{{ item.jenre }}<br>

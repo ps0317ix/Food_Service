@@ -12,13 +12,14 @@
       <h3>食べログ</h3>
       <ul class="pc">
       <% @x = 1
+          @placelength = @tabelogPlaces.length + 1
           @tabelogPlaces.each do |place|
             if @x % 11 == 0 %>
             <!-- 10カラムで改行 -->
               <ul>
             <% end %>
           <li><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
-            <% if @x % 10 == 0 %>
+            <% if @x % 10 == 0 || @x == @placelength %>
               </ul>
             <% end %>
         <% @x += 1
@@ -32,7 +33,7 @@
                 <ul>
               <% end %>
             <li><%= link_to "#{place.area}", "/place/#{place.area}/ranking" %></li>
-              <% if @x % 5 == 0 %>
+              <% if @x % 5 == 0 || @x == @placelength+1 %>
                 </ul>
               <% end %>
           <% @x += 1
@@ -68,11 +69,11 @@
               <ul>
                 <template v-for="item in getTabelogItems">
                   <a class="item_link" @click="windowOpen(item.no)">
-                    <li class="ranking_result row" v-bind:style="{opacity:item.opacity}">
-                        <div class="ranking_result_img col-md-4" style="padding:0px;">
+                    <li class="ranking_result" v-bind:style="{opacity:item.opacity}">
+                        <div class="ranking_result_img" style="padding:0px;">
                           <v-lazy-image :src="item.img" :src-placeholder="item.img" ></v-lazy-image>
                         </div>
-                        <div class="ranking_result_content col-md-8">
+                        <div class="ranking_result_content">
                           <h2 style="font-size:26px;">{{ item.name }}</h2>
                           <p class="address">{{ item.address }}</p>
                           <p style="font-size:11px;">{{ item.jenre }}<br>

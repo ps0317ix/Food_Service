@@ -23,6 +23,7 @@ class PlaceController < ApplicationController
 
   # 新規登録
   def new
+    @tabelogPlaces = Place.where(service: "食べログ")
     @place = Place.new
   end
 

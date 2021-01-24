@@ -279,10 +279,15 @@
     height: 180px;
     border: 1px solid rgb(255, 179, 0);
     background: #fff;
+    display: flex;
   }
 
   .col-md-4{
     padding: 0px;
+  }
+
+  .ranking_result_img{
+    width: 33%;
   }
 
   .ranking_result_img img{
@@ -293,8 +298,10 @@
 
   .ranking_result_content{
     text-align: left;
+    width: 66%;
     height: 179px;
     overflow: hidden;
+    padding: 0px 5px 0px 10px;
   }
 
 
@@ -361,6 +368,23 @@
 
      .sp{
        display: block;
+     }
+
+     .item_link{
+       display: block;
+       height: 180px;
+     }
+
+     .ranking_result{
+       display: block;
+     }
+
+     .ranking_result_img{
+       width: 100%;
+     }
+
+     .ranking_result_content{
+       width: 100%;
      }
 
    }
